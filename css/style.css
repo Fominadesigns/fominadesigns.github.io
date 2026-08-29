@@ -132,6 +132,25 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   padding-top:clamp(110px,14vh,180px);
 }
+/* --- місія: слова засвічуються при прокрутці -------------------------------
+   Без JS текст просто видимий і повністю читабельний — розбиття на слова
+   й приглушення додає скрипт, тому нічого не ламається, якщо він не
+   спрацював. */
+.mission{padding-block:clamp(90px,14vw,200px)}
+.mission__text{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(1.6rem,4.2vw,3.6rem);
+  line-height:1.14;letter-spacing:-.03em;
+  max-width:22ch;
+}
+.mission__word{
+  transition:opacity .45s ease,color .45s ease;
+}
+/* приглушення вмикає скрипт — інакше текст лишається звичайним */
+.js-mission .mission__word{opacity:.14}
+.js-mission .mission__word.lit{opacity:1}
+.js-mission .mission__word.lit--accent{color:var(--ink)}
+
 /* --- біжучі рядки й стрічка -----------------------------------------------
    Вміст усередині продубльований двічі, а доріжка їде рівно на половину
    своєї ширини — тому стик непомітний і рух безшовний. */

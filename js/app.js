@@ -213,6 +213,57 @@
     measure();
   }
 
+  /* --- місія: слова засвічуються при прокрутці -----------------------------
+
+     Текст лишається у розмітці цілим — розбиваємо на слова вже тут.
+     Якщо скрипт не спрацював, відвідувач бачить звичайний читабельний
+     абзац, а не приглушені уламки.                                        */
+
+  var mission = document.getElementById('missionText');
+
+  if (mission && !reduceMotion) {
+    var source = mission.textContent.trim();
+    var parts = source.split(/\s+/);
+
+    mission.textContent = '';
+    parts.forEach(function (w, i) {
+      var span = document.createElement('span');
+      span.className = 'mission__word';
+      span.textContent = w;
+      mission.appendChild(span);
+      if (i < parts.length - 1) {
+        mission.appendChild(document.createTextNode(' '));
+      }
+    });
+
+    document.documentElement.classList.add('js-mission');
+    var words = mission.querySelectorAll('.mission__word');
+    var mFrame = 0;
+
+    function lightUp() {
+      var r = mission.getBoundingClientRect();
+      var vh = window.innerHeight;
+
+      // 0 — блок тільки заходить знизу, 1 — доїхав до верхньої третини
+      var p = (vh * 0.85 - r.top) / (vh * 0.55);
+      if (p < 0) { p = 0; }
+      if (p > 1) { p = 1; }
+
+      var lit = Math.round(p * words.length);
+      for (var i = 0; i < words.length; i++) {
+        words[i].classList.toggle('lit', i < lit);
+      }
+      mFrame = 0;
+    }
+
+    window.addEventListener('scroll', function () {
+      if (mFrame) { return; }
+      mFrame = requestAnimationFrame(lightUp);
+    }, { passive: true });
+    window.addEventListener('resize', lightUp);
+    lightUp();
+  }
+
   /* --- слід із робіт за курсором ------------------------------------------
 
      Коли курсор проходить певну відстань, показуємо наступну картинку
