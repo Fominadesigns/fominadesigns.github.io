@@ -115,8 +115,11 @@
     var pinned = false;
     var frame = 0;
 
-    function disable() {
+    // Стан видно в розмітці як data-pin — щоб можна було подивитись у
+    // інспекторі, чому закріплення не ввімкнулось, замість здогадок.
+    function disable(reason) {
       pinned = false;
+      section.dataset.pin = reason || 'off';
       section.classList.remove('works--pinned');
       wrap.style.height = '';
       track.style.transform = '';
@@ -140,7 +143,8 @@
     function measure() {
       // На вузьких екранах і за увімкненого зменшення руху лишаємо звичайну
       // горизонтальну прокрутку — там закріплення радше заважає.
-      if (reduceMotion || window.innerWidth < 861) { disable(); return; }
+      if (reduceMotion) { disable('reduced-motion'); return; }
+      if (window.innerWidth < 861) { disable('narrow'); return; }
 
       // Міряємо, НЕ прибираючи висоту й не знімаючи клас: інакше документ
       // на мить коротшає на висоту секції, і браузер зсуває позицію
@@ -154,11 +158,12 @@
       var visible = viewport.clientWidth -
         (parseFloat(vs.paddingLeft) || 0) - (parseFloat(vs.paddingRight) || 0);
       var overflow = track.offsetWidth - visible;
-      if (overflow <= 40) { disable(); return; }
+      if (overflow <= 40) { disable('no-overflow'); return; }
 
       distance = overflow;
       lead = Math.round(window.innerHeight * 0.5);
       pinned = true;
+      section.dataset.pin = 'on';
       section.classList.add('works--pinned');
 
       // екран + пауза на початку + шлях доріжки + така сама пауза в кінці
@@ -183,8 +188,20 @@
       measure();
     });
 
-    // Картинки ліниві: доки вони не завантажились, ширина доріжки неправильна,
-    // тому переміряємо і після повного завантаження сторінки.
+    // Розмітка встоюється не одразу: підвантажуються шрифти й картинки,
+    // і ширина доріжки змінюється. ResizeObserver ловить це надійніше
+    // за окремі виклики на load — і сам виправляє стан, якщо перше
+    // вимірювання випало на невдалий момент.
+    if ('ResizeObserver' in window) {
+      var pending = 0;
+      var ro = new ResizeObserver(function () {
+        if (pending) { return; }
+        pending = requestAnimationFrame(function () { pending = 0; measure(); });
+      });
+      ro.observe(track);
+      ro.observe(viewport);
+    }
+
     window.addEventListener('load', measure);
     measure();
   }
@@ -214,15 +231,6 @@
       vImg.src = src;
       vImg.alt = cap;
       vCap.textContent = cap;
-
-      // Не розтягуємо понад справжній розмір файлу — інакше дрібні
-      // роботи виглядають розмитими. Ширину беремо після завантаження.
-      vImg.style.removeProperty('--natural-w');
-      var probe = new Image();
-      probe.onload = function () {
-        viewer.style.setProperty('--natural-w', probe.naturalWidth + 'px');
-      };
-      probe.src = src;
 
       vPrev.disabled = i === 0;
       vNext.disabled = i === frames.length - 1;
