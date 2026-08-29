@@ -213,6 +213,45 @@
     measure();
   }
 
+  /* --- діагностика ---------------------------------------------------------
+     Вмикається лише адресою ?debug — на звичайному сайті нічого не показує.
+     Потрібна, щоб побачити реальні розміри на чужому екрані, який не
+     вдається відтворити. */
+  if (location.search.indexOf('debug') !== -1) {
+    setTimeout(function () {
+      var de = document.documentElement;
+      var nav = document.querySelector('.nav');
+      var widest = null, widestW = 0;
+
+      document.querySelectorAll('body *').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.right > de.clientWidth + 2 && r.right > widestW) {
+          var host = el.closest('.works, .nav, .section');
+          if (!host || !host.classList.contains('works')) {
+            widestW = r.right;
+            widest = el.tagName + '.' + String(el.className).slice(0, 30);
+          }
+        }
+      });
+
+      var box = document.createElement('div');
+      box.style.cssText = 'position:fixed;z-index:9999;left:8px;bottom:8px;max-width:92vw;' +
+        'background:#0A0A0A;color:#F9FE4A;font:12px/1.5 monospace;padding:12px 14px;' +
+        'border-radius:8px;white-space:pre;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+      box.textContent =
+        'вікно (innerWidth):   ' + window.innerWidth + '\n' +
+        'сторінка (clientW):   ' + de.clientWidth + '\n' +
+        'ширина документа:     ' + de.scrollWidth + '\n' +
+        'ПЕРЕПОВНЕННЯ:         ' + (de.scrollWidth > de.clientWidth ? 'ТАК ← проблема' : 'ні') + '\n' +
+        'масштаб екрана:       ' + window.devicePixelRatio + '\n' +
+        'ширина шапки:         ' + Math.round(nav.getBoundingClientRect().width) + '\n' +
+        'галерея закріплена:   ' + (document.getElementById('gallery') || {}).dataset.pin + '\n' +
+        'overflow-x у html:    ' + getComputedStyle(de).overflowX + '\n' +
+        'найширший елемент:    ' + (widest || 'немає');
+      document.body.appendChild(box);
+    }, 2500);
+  }
+
   /* --- перегляд роботи на весь екран -------------------------------------- */
   var viewer = document.getElementById('viewer');
 
