@@ -243,9 +243,9 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 
    Базовий стан (він же запасний, якщо JS не спрацював або екран вузький) —
    звичайна горизонтальна прокрутка пальцем чи тачпадом.
-   Клас .works--pinned додає JS: тоді секція закріплюється, а доріжка
-   їде вбік пропорційно до того, скільки сторінки вже прокручено.
-   Саму прокрутку ми не перехоплюємо — рахуємо лише пройдений шлях.
+   Клас .works--pinned додає JS: секція закріплюється, а вся доріжка —
+   разом із заголовком — їде вбік пропорційно до пройденої прокрутки.
+   Саму прокрутку не перехоплюємо, рахуємо лише пройдений шлях.
 --------------------------------------------------------------------------- */
 
 /* Кут для градієнтної обводки. @property потрібен, щоб кут можна було
@@ -254,39 +254,34 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 
 .works{background:var(--cream);color:var(--ink);position:relative}
 .works__stage{padding:clamp(64px,9vw,120px) 0}
-.works__layout{
-  max-width:var(--maxw);margin:0 auto;padding:0 var(--pad);
-  display:grid;grid-template-columns:minmax(240px,26%) minmax(0,1fr);
-  gap:clamp(24px,4vw,56px);align-items:center;
+.works__viewport{
+  overflow-x:auto;overscroll-behavior-x:contain;
+  padding:4px var(--pad);
+  scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent;
 }
+.works__viewport::-webkit-scrollbar{height:6px}
+.works__viewport::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
+.works__track{display:flex;gap:clamp(16px,2vw,32px);align-items:center}
+
+/* заголовок — перша комірка доріжки, тому їде разом із роботами */
+.works__intro{flex:0 0 clamp(260px,28vw,380px);padding-right:clamp(8px,2vw,24px)}
 .works__intro p{margin-top:16px;color:var(--ink-60);font-size:15px}
 .works__hint{display:flex;align-items:center;gap:10px;margin-top:26px;color:var(--ink-40)}
-.works__hint svg{flex:0 0 auto}
 .works__hint span{display:flex;align-items:center;gap:10px}
+.works__hint svg{flex:0 0 auto}
 .works__hint--pinned{display:none}
-
 .works__progress{
   margin-top:22px;height:2px;background:var(--ink-12);border-radius:2px;overflow:hidden;
   opacity:0;transition:opacity .4s;
 }
-.works__progress span{
-  display:block;height:100%;width:0;background:var(--ink);border-radius:2px;
-}
-
-.works__viewport{overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;
-  padding:4px;margin:-4px;scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent}
-.works__viewport::-webkit-scrollbar{height:6px}
-.works__viewport::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
-.works__track{display:flex;gap:clamp(12px,1.4vw,20px)}
+.works__progress span{display:block;height:100%;width:0;background:var(--ink);border-radius:2px}
 
 /* --- закріплений режим --- */
-.works--pinned .works__wrap{position:relative}
 .works--pinned .works__stage{
   position:sticky;top:0;height:100svh;
   display:flex;align-items:center;overflow:hidden;padding:0;
 }
-.works--pinned .works__layout{width:100%}
-.works--pinned .works__viewport{overflow:visible;scroll-snap-type:none;padding:0;margin:0}
+.works--pinned .works__viewport{overflow:visible;padding:0 var(--pad)}
 .works--pinned .works__track{will-change:transform}
 .works--pinned .works__hint--free{display:none}
 .works--pinned .works__hint--pinned{display:flex}
@@ -294,18 +289,21 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 
 /* --- картка --- */
 .work{
-  flex:0 0 clamp(190px,20vw,260px);scroll-snap-align:start;
+  flex:0 0 clamp(190px,20vw,260px);
   position:relative;border-radius:14px;
   transition:transform .45s cubic-bezier(.2,.7,.3,1);
 }
 .work:hover{transform:translateY(-6px)}
 
 .work__frame{
+  display:block;width:100%;padding:0;
   position:relative;border-radius:14px;overflow:hidden;background:var(--ink);
   box-shadow:0 2px 8px rgba(10,10,10,.06);
+  cursor:zoom-in;
   transition:box-shadow .45s cubic-bezier(.2,.7,.3,1);
 }
 .work:hover .work__frame{box-shadow:0 18px 40px rgba(10,10,10,.18)}
+.work__frame:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
 
 /* Градієнтна обводка вмикається лише на ховері, щоб не смикати очі
    постійним рухом у дванадцяти картках одночасно. */
@@ -335,6 +333,42 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 @supports not (background:conic-gradient(from var(--angle),red,blue)){
   .work:hover .work__frame::before{background:var(--accent);animation:none}
 }
+
+/* --- перегляд роботи на весь екран ---------------------------------------- */
+.viewer{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;gap:clamp(8px,2vw,28px);
+  padding:clamp(16px,4vw,48px);
+  background:rgba(8,8,8,.94);
+  opacity:0;transition:opacity .3s ease;
+}
+.viewer[hidden]{display:none}
+.viewer.on{opacity:1}
+
+.viewer__body{
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  max-width:100%;max-height:100%;
+}
+/* Зображення не збільшуємо понад його справжній розмір — інакше
+   роботи в 400 пікселів завширшки виглядають розмитими. */
+.viewer__body img{
+  max-width:min(100%,var(--natural-w,900px));
+  max-height:82vh;width:auto;height:auto;
+  border-radius:8px;background:var(--ink);
+  transform:scale(.96);transition:transform .35s cubic-bezier(.2,.7,.3,1);
+}
+.viewer.on .viewer__body img{transform:scale(1)}
+.viewer__body figcaption{color:var(--cream-60);text-align:center}
+
+.viewer__close,.viewer__nav{
+  flex:0 0 auto;width:48px;height:48px;border-radius:999px;
+  border:1px solid var(--cream-12);color:var(--cream);
+  display:grid;place-items:center;
+  transition:background-color .3s,color .3s,border-color .3s,opacity .3s;
+}
+.viewer__close:hover,.viewer__nav:hover:not(:disabled){background:var(--cream);color:var(--ink)}
+.viewer__nav:disabled{opacity:.25;cursor:default}
+.viewer__close{position:absolute;top:clamp(16px,3vw,32px);right:clamp(16px,3vw,32px)}
 
 /* --- про мене ------------------------------------------------------------- */
 .about{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:start}
@@ -401,10 +435,8 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   .plans{grid-template-columns:1fr}
   .about{grid-template-columns:1fr}
   .about__photo{max-width:280px}
-  .works .wrap{grid-template-columns:1fr;gap:28px}
-  .works__intro{position:static}
-  .works__nav{display:none}
-  .work{flex:0 0 62vw}
+  .works__intro{flex:0 0 78vw}
+  .work{flex:0 0 58vw}
   .case-preview{display:none!important}
   .case{align-items:center;gap:.5em}
   .case__num{margin-top:0}
@@ -427,7 +459,8 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   .app{grid-template-columns:1fr;text-align:left}
   .app__shot{max-width:180px}
   .steps{grid-template-columns:1fr}
-  .work{flex:0 0 72vw}
+  .works__intro{flex:0 0 86vw}
+  .work{flex:0 0 70vw}
 }
 
 /* --- повага до налаштувань руху ------------------------------------------- */

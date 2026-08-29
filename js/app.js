@@ -122,11 +122,15 @@
       track.style.transform = '';
     }
 
+    // Пауза до початку руху й така сама після його кінця: блок встигає
+    // стати посередині екрана, перш ніж поїхати вбік, і затримується
+    // на останній роботі, перш ніж сторінка поїде далі вниз.
+    var lead = 0;
+
     function update() {
       if (!pinned) return;
-      var top = wrap.getBoundingClientRect().top;
-      var total = wrap.offsetHeight - window.innerHeight;
-      var p = total > 0 ? -top / total : 0;
+      var scrolled = -wrap.getBoundingClientRect().top;
+      var p = (scrolled - lead) / distance;
       if (p < 0) { p = 0; }
       if (p > 1) { p = 1; }
       track.style.transform = 'translate3d(' + (-p * distance).toFixed(1) + 'px, 0, 0)';
@@ -138,19 +142,21 @@
       // горизонтальну прокрутку — там закріплення радше заважає.
       if (reduceMotion || window.innerWidth < 861) { disable(); return; }
 
-      // Міряємо у вимкненому стані, щоб дістати справжню ширину доріжки.
-      section.classList.remove('works--pinned');
-      wrap.style.height = '';
-      track.style.transform = '';
-
+      // Міряємо, НЕ прибираючи висоту й не знімаючи клас: інакше документ
+      // на мить коротшає на висоту секції, і браузер зсуває позицію
+      // прокрутки — сторінка стрибає. transform на ширину не впливає,
+      // тому scrollWidth правильний і в закріпленому стані.
       var overflow = track.scrollWidth - viewport.clientWidth;
       if (overflow <= 40) { disable(); return; }
 
       distance = overflow;
+      lead = Math.round(window.innerHeight * 0.5);
       pinned = true;
       section.classList.add('works--pinned');
-      // висота секції = екран + шлях, який має проїхати доріжка
-      wrap.style.height = (window.innerHeight + distance) + 'px';
+
+      // екран + пауза на початку + шлях доріжки + така сама пауза в кінці
+      var height = (window.innerHeight + lead + distance + lead) + 'px';
+      if (wrap.style.height !== height) { wrap.style.height = height; }
       update();
     }
 
@@ -160,11 +166,100 @@
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', measure);
+
+    // На мобільних адресний рядок ховається й показується, і це щоразу
+    // надсилає resize. Переміряємо лише коли справді змінилась ширина.
+    var lastWidth = window.innerWidth;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth === lastWidth) { update(); return; }
+      lastWidth = window.innerWidth;
+      measure();
+    });
 
     // Картинки ліниві: доки вони не завантажились, ширина доріжки неправильна,
     // тому переміряємо і після повного завантаження сторінки.
     window.addEventListener('load', measure);
     measure();
+  }
+
+  /* --- перегляд роботи на весь екран -------------------------------------- */
+  var viewer = document.getElementById('viewer');
+
+  if (viewer) {
+    var vImg = document.getElementById('viewerImg');
+    var vCap = document.getElementById('viewerCaption');
+    var vClose = document.getElementById('viewerClose');
+    var vPrev = document.getElementById('viewerPrev');
+    var vNext = document.getElementById('viewerNext');
+    var frames = Array.prototype.slice.call(document.querySelectorAll('.work__frame[data-full]'));
+    var current = 0;
+    var lastFocused = null;
+
+    function show(i) {
+      if (i < 0) { i = 0; }
+      if (i > frames.length - 1) { i = frames.length - 1; }
+      current = i;
+
+      var el = frames[i];
+      var src = el.getAttribute('data-full');
+      var cap = el.getAttribute('data-caption') || '';
+
+      vImg.src = src;
+      vImg.alt = cap;
+      vCap.textContent = cap;
+
+      // Не розтягуємо понад справжній розмір файлу — інакше дрібні
+      // роботи виглядають розмитими. Ширину беремо після завантаження.
+      vImg.style.removeProperty('--natural-w');
+      var probe = new Image();
+      probe.onload = function () {
+        viewer.style.setProperty('--natural-w', probe.naturalWidth + 'px');
+      };
+      probe.src = src;
+
+      vPrev.disabled = i === 0;
+      vNext.disabled = i === frames.length - 1;
+    }
+
+    function open(i) {
+      lastFocused = document.activeElement;
+      show(i);
+      viewer.hidden = false;
+      // наступний кадр — щоб спрацював перехід прозорості
+      requestAnimationFrame(function () { viewer.classList.add('on'); });
+      document.body.style.overflow = 'hidden';
+      vClose.focus();
+    }
+
+    function close() {
+      viewer.classList.remove('on');
+      document.body.style.overflow = '';
+      var done = function () {
+        viewer.hidden = true;
+        viewer.removeEventListener('transitionend', done);
+      };
+      if (reduceMotion) { done(); } else { viewer.addEventListener('transitionend', done); }
+      if (lastFocused && lastFocused.focus) { lastFocused.focus(); }
+    }
+
+    frames.forEach(function (el, i) {
+      el.addEventListener('click', function () { open(i); });
+    });
+
+    vClose.addEventListener('click', close);
+    vPrev.addEventListener('click', function () { show(current - 1); });
+    vNext.addEventListener('click', function () { show(current + 1); });
+
+    // клік повз зображення закриває
+    viewer.addEventListener('click', function (e) {
+      if (e.target === viewer) { close(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (viewer.hidden) { return; }
+      if (e.key === 'Escape') { close(); }
+      if (e.key === 'ArrowLeft') { show(current - 1); }
+      if (e.key === 'ArrowRight') { show(current + 1); }
+    });
   }
 })();

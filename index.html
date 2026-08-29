@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;600;800&family=Cormorant:ital,wght@1,300;1,400&family=Wix+Madefor+Display:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link href="css/style.css?v=2" rel="stylesheet">
+<link href="css/style.css?v=3" rel="stylesheet">
 </head>
 <body>
 
@@ -268,80 +268,103 @@
 </section>
 
 <!-- ============================== РОБОТИ ================================= -->
-<!-- Секція закріплюється, доки роботи їдуть убік. Висоту обгортки рахує JS.
-     Без JS або на вузькому екрані працює як звичайна горизонтальна прокрутка. -->
+<!-- Заголовок їде разом із роботами — він перша комірка доріжки.
+     Висоту секції рахує JS: екран + пауза + шлях доріжки + така сама пауза. -->
 <section id="gallery" class="works light">
   <div class="works__wrap" id="worksWrap">
     <div class="works__stage">
-      <div class="works__layout">
-        <div class="works__intro">
-          <p class="mono section-label">[ 06 ]</p>
-          <h2 class="section-title">Креативи,<br><span class="soft">презентації</span></h2>
-          <p>Рекламні макети, оформлення сторінок, презентації для клієнтів та інвесторів — те, що зазвичай замовляють разом із сайтом.</p>
-          <div class="works__hint mono">
-            <span class="works__hint--pinned">
-              <svg width="8" height="22" viewBox="0 0 8 22" fill="none" aria-hidden="true"><path d="M4 0v20M1 17l3 3 3-3" stroke="currentColor" stroke-width="1.2"/></svg>
-              Прокручуйте вниз
-            </span>
-            <span class="works__hint--free">
-              <svg width="22" height="8" viewBox="0 0 22 8" fill="none" aria-hidden="true"><path d="M0 4h20M17 1l3 3-3 3" stroke="currentColor" stroke-width="1.2"/></svg>
-              Гортайте вбік
-            </span>
-          </div>
-          <div class="works__progress" aria-hidden="true"><span id="worksBar"></span></div>
-        </div>
+      <div class="works__viewport" id="worksViewport">
+        <div class="works__track" id="worksTrack" role="region" aria-label="Галерея робіт">
 
-        <div class="works__viewport" id="worksViewport">
-          <div class="works__track" id="worksTrack" role="region" aria-label="Галерея робіт">
+          <div class="works__intro">
+            <p class="mono section-label">[ 06 ]</p>
+            <h2 class="section-title">Креативи,<br><span class="soft">презентації</span></h2>
+            <p>Рекламні макети, оформлення сторінок, презентації для клієнтів та інвесторів — те, що зазвичай замовляють разом із сайтом.</p>
+            <div class="works__hint mono">
+              <span class="works__hint--pinned">
+                <svg width="8" height="22" viewBox="0 0 8 22" fill="none" aria-hidden="true"><path d="M4 0v20M1 17l3 3 3-3" stroke="currentColor" stroke-width="1.2"/></svg>
+                Прокручуйте вниз
+              </span>
+              <span class="works__hint--free">
+                <svg width="22" height="8" viewBox="0 0 22 8" fill="none" aria-hidden="true"><path d="M0 4h20M17 1l3 3-3 3" stroke="currentColor" stroke-width="1.2"/></svg>
+                Гортайте вбік
+              </span>
+            </div>
+            <div class="works__progress" aria-hidden="true"><span id="worksBar"></span></div>
+          </div>
+
           <figure class="work">
-            <div class="work__frame"><img src="images/Logistic-mini.png" alt="Презентація для логістичної компанії" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Logistic-mini.png" data-caption="Презентація для логістичної компанії" aria-label="Відкрити на весь екран: Презентація для логістичної компанії">
+              <img src="images/Logistic-mini.png" alt="Презентація для логістичної компанії" loading="lazy">
+            </button>
             <figcaption>Презентація для логістичної компанії</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Instagram.png" alt="Оформлення сторінки в Instagram" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Instagram.png" data-caption="Оформлення сторінки в Instagram" aria-label="Відкрити на весь екран: Оформлення сторінки в Instagram">
+              <img src="images/Instagram.png" alt="Оформлення сторінки в Instagram" loading="lazy">
+            </button>
             <figcaption>Оформлення сторінки в Instagram</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Export-mini.png" alt="Презентація для залучення інвесторів" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Export-mini.png" data-caption="Презентація для залучення інвесторів" aria-label="Відкрити на весь екран: Презентація для залучення інвесторів">
+              <img src="images/Export-mini.png" alt="Презентація для залучення інвесторів" loading="lazy">
+            </button>
             <figcaption>Презентація для залучення інвесторів</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Inst-logistic.png" alt="Рекламні креативи для Instagram" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Inst-logistic.png" data-caption="Рекламні креативи для Instagram" aria-label="Відкрити на весь екран: Рекламні креативи для Instagram">
+              <img src="images/Inst-logistic.png" alt="Рекламні креативи для Instagram" loading="lazy">
+            </button>
             <figcaption>Рекламні креативи для Instagram</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Tranier-mini.png" alt="Презентація для фітнес-тренера" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Tranier-mini.png" data-caption="Презентація для фітнес-тренера" aria-label="Відкрити на весь екран: Презентація для фітнес-тренера">
+              <img src="images/Tranier-mini.png" alt="Презентація для фітнес-тренера" loading="lazy">
+            </button>
             <figcaption>Презентація для фітнес-тренера</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Event-mini.png" alt="Афіша навчального івенту" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Event-mini.png" data-caption="Афіша навчального івенту" aria-label="Відкрити на весь екран: Афіша навчального івенту">
+              <img src="images/Event-mini.png" alt="Афіша навчального івенту" loading="lazy">
+            </button>
             <figcaption>Афіша навчального івенту</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/Travel-mini.png" alt="Банери для тревел-агенції" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/Travel-mini.png" data-caption="Банери для тревел-агенції" aria-label="Відкрити на весь екран: Банери для тревел-агенції">
+              <img src="images/Travel-mini.png" alt="Банери для тревел-агенції" loading="lazy">
+            </button>
             <figcaption>Банери для тревел-агенції</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/SMEG-mini.png" alt="Презентація товару" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/SMEG-mini.png" data-caption="Презентація товару" aria-label="Відкрити на весь екран: Презентація товару">
+              <img src="images/SMEG-mini.png" alt="Презентація товару" loading="lazy">
+            </button>
             <figcaption>Презентація товару</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/My-mini.png" alt="Презентація дизайнера" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/My-mini.png" data-caption="Презентація дизайнера" aria-label="Відкрити на весь екран: Презентація дизайнера">
+              <img src="images/My-mini.png" alt="Презентація дизайнера" loading="lazy">
+            </button>
             <figcaption>Презентація дизайнера</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/kreativni-ideji-dlja-instagram-reklamy.jpg" alt="Креативи для Instagram-реклами" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/kreativni-ideji-dlja-instagram-reklamy.jpg" data-caption="Креативи для Instagram-реклами" aria-label="Відкрити на весь екран: Креативи для Instagram-реклами">
+              <img src="images/kreativni-ideji-dlja-instagram-reklamy.jpg" alt="Креативи для Instagram-реклами" loading="lazy">
+            </button>
             <figcaption>Креативи для Instagram-реклами</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/promociyni-banery-instagram-2025.jpg" alt="Промоційні банери" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/promociyni-banery-instagram-2025.jpg" data-caption="Промоційні банери" aria-label="Відкрити на весь екран: Промоційні банери">
+              <img src="images/promociyni-banery-instagram-2025.jpg" alt="Промоційні банери" loading="lazy">
+            </button>
             <figcaption>Промоційні банери</figcaption>
           </figure>
           <figure class="work">
-            <div class="work__frame"><img src="images/banery-dlja-instagram-reklamy-dlja-biznesa-1.jpg" alt="Банери для бізнесу" loading="lazy"></div>
+            <button type="button" class="work__frame" data-full="images/banery-dlja-instagram-reklamy-dlja-biznesa-1.jpg" data-caption="Банери для бізнесу" aria-label="Відкрити на весь екран: Банери для бізнесу">
+              <img src="images/banery-dlja-instagram-reklamy-dlja-biznesa-1.jpg" alt="Банери для бізнесу" loading="lazy">
+            </button>
             <figcaption>Банери для бізнесу</figcaption>
           </figure>
-          </div>
         </div>
       </div>
     </div>
@@ -410,6 +433,24 @@
   <a href="https://t.me/fominadesigns" target="_blank" rel="noopener" class="btn btn--accent">Замовити</a>
 </div>
 
-<script src="js/app.js?v=2"></script>
+
+<!-- Перегляд роботи на весь екран -->
+<div class="viewer" id="viewer" hidden>
+  <button type="button" class="viewer__close" id="viewerClose" aria-label="Закрити">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M1 1l16 16M17 1L1 17" stroke="currentColor" stroke-width="1.5"/></svg>
+  </button>
+  <button type="button" class="viewer__nav viewer__nav--prev" id="viewerPrev" aria-label="Попередня робота">
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M16 6H1M5 1L1 6l4 5" stroke="currentColor" stroke-width="1.4"/></svg>
+  </button>
+  <figure class="viewer__body">
+    <img id="viewerImg" src="" alt="">
+    <figcaption class="mono" id="viewerCaption"></figcaption>
+  </figure>
+  <button type="button" class="viewer__nav viewer__nav--next" id="viewerNext" aria-label="Наступна робота">
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" aria-hidden="true"><path d="M0 6h15M11 1l4 5-4 5" stroke="currentColor" stroke-width="1.4"/></svg>
+  </button>
+</div>
+
+<script src="js/app.js?v=3"></script>
 </body>
 </html>
