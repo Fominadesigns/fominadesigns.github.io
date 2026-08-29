@@ -144,9 +144,16 @@
 
       // Міряємо, НЕ прибираючи висоту й не знімаючи клас: інакше документ
       // на мить коротшає на висоту секції, і браузер зсуває позицію
-      // прокрутки — сторінка стрибає. transform на ширину не впливає,
-      // тому scrollWidth правильний і в закріпленому стані.
-      var overflow = track.scrollWidth - viewport.clientWidth;
+      // прокрутки — сторінка стрибає.
+      //
+      // offsetWidth, а не scrollWidth: у закріпленому стані overflow стає
+      // visible, і scrollWidth перестає показувати справжню ширину вмісту.
+      // offsetWidth разом із width:max-content дає її завжди, і зсув
+      // доріжки на нього не впливає.
+      var vs = getComputedStyle(viewport);
+      var visible = viewport.clientWidth -
+        (parseFloat(vs.paddingLeft) || 0) - (parseFloat(vs.paddingRight) || 0);
+      var overflow = track.offsetWidth - visible;
       if (overflow <= 40) { disable(); return; }
 
       distance = overflow;

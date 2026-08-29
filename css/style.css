@@ -282,7 +282,9 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   display:flex;align-items:center;overflow:hidden;padding:0;
 }
 .works--pinned .works__viewport{overflow:visible;padding:0 var(--pad)}
-.works--pinned .works__track{will-change:transform}
+/* max-content — щоб доріжка мала справжню ширину вмісту,
+   інакше її неможливо правильно виміряти в закріпленому стані */
+.works--pinned .works__track{will-change:transform;width:max-content}
 .works--pinned .works__hint--free{display:none}
 .works--pinned .works__hint--pinned{display:flex}
 .works--pinned .works__progress{opacity:1}
