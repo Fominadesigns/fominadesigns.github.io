@@ -1,5 +1,5 @@
 /* Fomina.Designs — інтерактив сайту.
-   Три речі: мобільне меню, поява блоків при скролі, прев'ю кейсів за курсором. */
+   Мобільне меню, поява блоків, прев'ю кейсів, закріплена галерея робіт. */
 (function () {
   'use strict';
 
@@ -52,20 +52,20 @@
 
   if (preview && cases.length && hasHover && !reduceMotion) {
     var img = preview.querySelector('img');
-    var x = 0, y = 0, ticking = false;
+    var px = 0, py = 0, pticking = false;
 
     function place() {
-      preview.style.setProperty('--x', x + 'px');
-      preview.style.setProperty('--y', y + 'px');
-      ticking = false;
+      preview.style.setProperty('--x', px + 'px');
+      preview.style.setProperty('--y', py + 'px');
+      pticking = false;
     }
 
     function onMove(e) {
       // зсув від курсора, щоб прев'ю не перекривало саму назву
-      x = e.clientX + 40;
-      y = e.clientY;
-      if (!ticking) {
-        ticking = true;
+      px = e.clientX + 40;
+      py = e.clientY;
+      if (!pticking) {
+        pticking = true;
         requestAnimationFrame(place);
       }
     }
@@ -97,71 +97,74 @@
     // mouseleave спрацьовує сам.
   }
 
-  /* --- горизонтальна доріжка робіт --------------------------------------- */
+  /* --- роботи: закріплена горизонтальна прокрутка -------------------------
+
+     Прокрутку сторінки НЕ перехоплюємо. Секція просто вища за екран,
+     всередині неї закріплена сцена, а доріжку зсуваємо рівно на стільки,
+     скільки сторінки вже пройдено. Тому смуга прокрутки, клавіатура,
+     Home/End та інерція тачпада поводяться як завжди.                      */
+
+  var section = document.getElementById('gallery');
+  var wrap = document.getElementById('worksWrap');
+  var viewport = document.getElementById('worksViewport');
   var track = document.getElementById('worksTrack');
-  var prev = document.getElementById('worksPrev');
-  var next = document.getElementById('worksNext');
+  var bar = document.getElementById('worksBar');
 
-  if (track) {
-    // на скільки гортати стрілкою — ширина картки разом із проміжком
-    function step() {
-      var card = track.querySelector('.work');
-      if (!card) return track.clientWidth;
-      var gap = parseFloat(getComputedStyle(track).columnGap) || 16;
-      return card.getBoundingClientRect().width + gap;
+  if (section && wrap && viewport && track) {
+    var distance = 0;
+    var pinned = false;
+    var frame = 0;
+
+    function disable() {
+      pinned = false;
+      section.classList.remove('works--pinned');
+      wrap.style.height = '';
+      track.style.transform = '';
     }
 
-    function scrollBy(dir) {
-      track.scrollBy({
-        left: dir * step() * 2,
-        behavior: reduceMotion ? 'auto' : 'smooth'
-      });
+    function update() {
+      if (!pinned) return;
+      var top = wrap.getBoundingClientRect().top;
+      var total = wrap.offsetHeight - window.innerHeight;
+      var p = total > 0 ? -top / total : 0;
+      if (p < 0) { p = 0; }
+      if (p > 1) { p = 1; }
+      track.style.transform = 'translate3d(' + (-p * distance).toFixed(1) + 'px, 0, 0)';
+      if (bar) { bar.style.width = (p * 100).toFixed(1) + '%'; }
     }
 
-    if (prev) prev.addEventListener('click', function () { scrollBy(-1); });
-    if (next) next.addEventListener('click', function () { scrollBy(1); });
+    function measure() {
+      // На вузьких екранах і за увімкненого зменшення руху лишаємо звичайну
+      // горизонтальну прокрутку — там закріплення радше заважає.
+      if (reduceMotion || window.innerWidth < 861) { disable(); return; }
 
-    // гасимо стрілку, коли доїхали до краю
-    function syncArrows() {
-      if (!prev || !next) return;
-      var max = track.scrollWidth - track.clientWidth;
-      prev.disabled = track.scrollLeft <= 2;
-      next.disabled = track.scrollLeft >= max - 2;
+      // Міряємо у вимкненому стані, щоб дістати справжню ширину доріжки.
+      section.classList.remove('works--pinned');
+      wrap.style.height = '';
+      track.style.transform = '';
+
+      var overflow = track.scrollWidth - viewport.clientWidth;
+      if (overflow <= 40) { disable(); return; }
+
+      distance = overflow;
+      pinned = true;
+      section.classList.add('works--pinned');
+      // висота секції = екран + шлях, який має проїхати доріжка
+      wrap.style.height = (window.innerHeight + distance) + 'px';
+      update();
     }
-    track.addEventListener('scroll', syncArrows, { passive: true });
-    window.addEventListener('resize', syncArrows);
-    syncArrows();
 
-    // перетягування мишкою
-    var down = false, startX = 0, startLeft = 0, moved = 0;
-
-    track.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'touch') return; // палець гортає сам
-      down = true; moved = 0;
-      startX = e.clientX;
-      startLeft = track.scrollLeft;
-      track.classList.add('dragging');
-    });
-
-    track.addEventListener('pointermove', function (e) {
-      if (!down) return;
-      var dx = e.clientX - startX;
-      moved = Math.abs(dx);
-      if (moved > 3) track.setPointerCapture(e.pointerId);
-      track.scrollLeft = startLeft - dx;
-    });
-
-    function endDrag() {
-      if (!down) return;
-      down = false;
-      track.classList.remove('dragging');
+    function onScroll() {
+      if (frame) { return; }
+      frame = requestAnimationFrame(function () { frame = 0; update(); });
     }
-    track.addEventListener('pointerup', endDrag);
-    track.addEventListener('pointercancel', endDrag);
 
-    // якщо картку тягнули, а не клацнули — не відкриваємо посилання
-    track.addEventListener('click', function (e) {
-      if (moved > 5) { e.preventDefault(); e.stopPropagation(); }
-    }, true);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', measure);
+
+    // Картинки ліниві: доки вони не завантажились, ширина доріжки неправильна,
+    // тому переміряємо і після повного завантаження сторінки.
+    window.addEventListener('load', measure);
+    measure();
   }
 })();

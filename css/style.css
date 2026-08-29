@@ -30,11 +30,13 @@ body{
   background:var(--cream);color:var(--ink);
   font-family:var(--text);font-size:17px;line-height:1.55;
   -webkit-font-smoothing:antialiased;overflow-x:hidden;
+  /* clip не створює контейнер прокрутки, тому не ламає sticky */
 }
 img{max-width:100%;height:auto;display:block}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 ul{list-style:none}
+@supports (overflow:clip){body{overflow-x:clip}}
 
 /* --- типографіка ---------------------------------------------------------- */
 .mono{
@@ -237,64 +239,76 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .plan .btn{margin-top:auto;align-self:flex-start}
 .plans-note{margin-top:24px;color:var(--ink-40);max-width:60ch}
 
-/* --- роботи: горизонтальна прокрутка --------------------------------------- */
+/* --- роботи: закріплена горизонтальна прокрутка ----------------------------
+
+   Базовий стан (він же запасний, якщо JS не спрацював або екран вузький) —
+   звичайна горизонтальна прокрутка пальцем чи тачпадом.
+   Клас .works--pinned додає JS: тоді секція закріплюється, а доріжка
+   їде вбік пропорційно до того, скільки сторінки вже прокручено.
+   Саму прокрутку ми не перехоплюємо — рахуємо лише пройдений шлях.
+--------------------------------------------------------------------------- */
 
 /* Кут для градієнтної обводки. @property потрібен, щоб кут можна було
    анімувати — звичайну CSS-змінну браузер анімувати не вміє. */
 @property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
 
-.works .wrap{
+.works{background:var(--cream);color:var(--ink);position:relative}
+.works__stage{padding:clamp(64px,9vw,120px) 0}
+.works__layout{
+  max-width:var(--maxw);margin:0 auto;padding:0 var(--pad);
   display:grid;grid-template-columns:minmax(240px,26%) minmax(0,1fr);
-  gap:clamp(24px,4vw,64px);align-items:start;
+  gap:clamp(24px,4vw,56px);align-items:center;
 }
-.works__intro{position:sticky;top:110px}
-.works__intro p{margin-top:18px;color:var(--ink-60);font-size:15px}
-.works__hint{
-  display:flex;align-items:center;gap:10px;margin-top:24px;color:var(--ink-40);
-}
+.works__intro p{margin-top:16px;color:var(--ink-60);font-size:15px}
+.works__hint{display:flex;align-items:center;gap:10px;margin-top:26px;color:var(--ink-40)}
 .works__hint svg{flex:0 0 auto}
+.works__hint span{display:flex;align-items:center;gap:10px}
+.works__hint--pinned{display:none}
 
-.works__nav{display:flex;gap:8px;margin-top:24px}
-.works__arrow{
-  width:44px;height:44px;border-radius:999px;border:1px solid var(--ink-12);
-  display:grid;place-items:center;
-  transition:border-color .3s,background-color .3s,color .3s,opacity .3s;
+.works__progress{
+  margin-top:22px;height:2px;background:var(--ink-12);border-radius:2px;overflow:hidden;
+  opacity:0;transition:opacity .4s;
 }
-.works__arrow:hover:not(:disabled){background:var(--ink);color:var(--cream);border-color:var(--ink)}
-.works__arrow:disabled{opacity:.25;cursor:default}
-
-/* Доріжка. Прокрутка справжня, тому працює і пальцем, і тачпадом,
-   і клавіатурою — нічого не перехоплюємо. */
-.works__track{
-  display:flex;gap:clamp(12px,1.4vw,20px);
-  overflow-x:auto;overscroll-behavior-x:contain;
-  scroll-snap-type:x proximity;
-  padding:4px 4px 22px;margin:-4px -4px 0;
-  scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent;
-  cursor:grab;
+.works__progress span{
+  display:block;height:100%;width:0;background:var(--ink);border-radius:2px;
 }
-.works__track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
-.works__track::-webkit-scrollbar{height:6px}
-.works__track::-webkit-scrollbar-track{background:transparent}
-.works__track::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
-.works__track::-webkit-scrollbar-thumb:hover{background:var(--ink-40)}
 
+.works__viewport{overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x proximity;
+  padding:4px;margin:-4px;scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent}
+.works__viewport::-webkit-scrollbar{height:6px}
+.works__viewport::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
+.works__track{display:flex;gap:clamp(12px,1.4vw,20px)}
+
+/* --- закріплений режим --- */
+.works--pinned .works__wrap{position:relative}
+.works--pinned .works__stage{
+  position:sticky;top:0;height:100svh;
+  display:flex;align-items:center;overflow:hidden;padding:0;
+}
+.works--pinned .works__layout{width:100%}
+.works--pinned .works__viewport{overflow:visible;scroll-snap-type:none;padding:0;margin:0}
+.works--pinned .works__track{will-change:transform}
+.works--pinned .works__hint--free{display:none}
+.works--pinned .works__hint--pinned{display:flex}
+.works--pinned .works__progress{opacity:1}
+
+/* --- картка --- */
 .work{
-  flex:0 0 clamp(190px,22vw,270px);scroll-snap-align:start;
+  flex:0 0 clamp(190px,20vw,260px);scroll-snap-align:start;
   position:relative;border-radius:14px;
   transition:transform .45s cubic-bezier(.2,.7,.3,1);
 }
 .work:hover{transform:translateY(-6px)}
 
-/* Градієнтна обводка: шар під карткою, який перелив ається по колу.
-   Вмикається на ховері, щоб не смикати очі постійним рухом. */
 .work__frame{
-  position:relative;border-radius:14px;overflow:hidden;
-  background:var(--ink);
+  position:relative;border-radius:14px;overflow:hidden;background:var(--ink);
   box-shadow:0 2px 8px rgba(10,10,10,.06);
   transition:box-shadow .45s cubic-bezier(.2,.7,.3,1);
 }
 .work:hover .work__frame{box-shadow:0 18px 40px rgba(10,10,10,.18)}
+
+/* Градієнтна обводка вмикається лише на ховері, щоб не смикати очі
+   постійним рухом у дванадцяти картках одночасно. */
 .work__frame::before{
   content:"";position:absolute;inset:-2px;z-index:0;border-radius:16px;
   background:conic-gradient(from var(--angle),
@@ -318,7 +332,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 .work:hover figcaption{color:var(--ink)}
 
-/* Якщо браузер не вміє анімувати @property — просто рівна жовта обводка. */
 @supports not (background:conic-gradient(from var(--angle),red,blue)){
   .work:hover .work__frame::before{background:var(--accent);animation:none}
 }
