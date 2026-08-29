@@ -172,6 +172,40 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .service:hover{border-color:var(--accent);transform:translateY(-3px)}
 .service--main{grid-column:span 12;border-color:var(--accent)}
 .service--main h3{font-size:clamp(1.6rem,3.4vw,2.6rem);text-transform:uppercase}
+.service__lead{margin-top:14px;max-width:52ch;color:var(--cream-60)}
+.service--main .btn{margin-top:26px}
+
+/* другий ряд — дрібніші картки, щоб видно було ієрархію */
+.services__divider{
+  grid-column:span 12;margin:clamp(20px,3vw,36px) 0 0;
+  color:var(--cream-40);
+}
+.service--small{grid-column:span 4;padding:clamp(18px,2vw,26px)}
+.service--small h3{font-size:clamp(1rem,1.4vw,1.2rem)}
+.service--small ul{margin-top:12px;flex-direction:column;gap:6px}
+.service--small li{font-size:14px}
+
+/* --- міні-додатки ---------------------------------------------------------- */
+.apps__lead{max-width:60ch;margin-bottom:clamp(32px,4vw,56px);color:var(--ink-60)}
+.apps{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(20px,3vw,40px)}
+.app{
+  display:grid;grid-template-columns:minmax(140px,38%) minmax(0,1fr);
+  gap:clamp(18px,2.4vw,32px);align-items:center;
+  padding:clamp(18px,2.2vw,28px);
+  border:1px solid var(--ink-12);border-radius:14px;
+  transition:border-color .35s,transform .35s cubic-bezier(.2,.7,.3,1),box-shadow .35s;
+}
+.app:hover{border-color:var(--ink);transform:translateY(-4px);box-shadow:0 16px 36px rgba(10,10,10,.12)}
+.app__shot{
+  aspect-ratio:9/16;border-radius:12px;overflow:hidden;background:var(--ink);
+}
+.app__shot img{width:100%;height:100%;object-fit:cover}
+.app__shot--empty{
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;
+  background:none;border:1px dashed var(--ink-12);color:var(--ink-40);
+}
+.app__tag{color:var(--ink-40);margin-bottom:10px}
+.app__body p{margin-top:12px;color:var(--ink-60);font-size:15px}
 .service__num{color:var(--accent);margin-bottom:16px}
 .service ul{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px 20px}
 .service li{color:var(--cream-60);font-size:15px;display:flex;gap:.5em}
@@ -336,6 +370,8 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 /* --- адаптив -------------------------------------------------------------- */
 @media (max-width:1100px){
   .service{grid-column:span 6}
+  .service--small{grid-column:span 6}
+  .apps{grid-template-columns:1fr}
   .steps{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:860px){
@@ -374,6 +410,9 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 @media (max-width:560px){
   .service{grid-column:span 12}
+  .service--small{grid-column:span 12}
+  .app{grid-template-columns:1fr;text-align:left}
+  .app__shot{max-width:180px}
   .steps{grid-template-columns:1fr}
   .work{flex:0 0 72vw}
 }
