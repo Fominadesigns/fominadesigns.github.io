@@ -306,6 +306,19 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   flex:0 0 100%;width:100%;min-width:0;
 }
 .works--pinned .works__track{will-change:transform}
+
+/* У закріпленому режимі картку задає ВИСОТА, а не ширина: так ряд
+   гарантовано вміщається в екран і стоїть рівно посередині,
+   на будь-якому масштабі й розмірі вікна. */
+.works--pinned .work{flex:0 0 auto}
+.works--pinned .work__frame{width:max-content}
+.works--pinned .work__frame img{
+  height:clamp(220px,48svh,480px);width:auto;
+}
+
+/* Хвіст доріжки: щоб остання робота доїжджала не впритул до краю,
+   а з відступом — і лише тоді прокрутка йшла вниз. */
+.works__tail{flex:0 0 clamp(24px,8vw,180px)}
 .works--pinned .works__hint--free{display:none}
 .works--pinned .works__hint--pinned{display:flex}
 .works--pinned .works__progress{opacity:1}
