@@ -61,6 +61,9 @@
       if (menuBox.hidden) { openMenu(); } else { closeMenu(); }
     });
 
+    var menuClose = document.getElementById('menuClose');
+    if (menuClose) { menuClose.addEventListener('click', closeMenu); }
+
     menuBox.addEventListener('click', function (e) {
       if (e.target.closest('a')) { closeMenu(); }
     });
