@@ -269,27 +269,15 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 /* --- слід із робіт за курсором --------------------------------------------
    Картинки лежать поверх першого екрана, але не перехоплюють кліки.
    Показує їх JS по черзі за рухом миші. Текст лишається над ними. */
-.trail{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.trail{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
 .trail__img{
   position:absolute;top:0;left:0;
   width:clamp(110px,10vw,165px);aspect-ratio:9/16;
   object-fit:cover;border-radius:10px;
   opacity:0;will-change:transform,opacity;
 }
-.hero .wrap{position:relative}
+.hero .wrap{position:relative;z-index:2}
 
-/* Інверсія: заголовок змішується з тим, що під ним. Над темним тлом
-   лишається світлим, а там, де його перекриває яскравий креатив —
-   стає темним. Саме через це .hero .wrap не має z-index: він створив
-   би окремий контекст накладання, і змішування б не працювало. */
-.hero__title{
-  mix-blend-mode:difference;
-  color:var(--cream);
-  position:relative;
-}
-@supports not (mix-blend-mode:difference){
-  .hero__title{mix-blend-mode:normal}
-}
 
 .hero__label{color:var(--accent);margin-bottom:clamp(24px,4vh,48px)}
 .hero__title{max-width:18ch}
@@ -389,6 +377,8 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .app__tag{color:var(--ink-40);margin-bottom:10px}
 .app__body{min-width:0}
 .app__body p{margin-top:12px;color:var(--ink-60);font-size:15px}
+.app__link{display:inline-block;margin-top:18px;color:var(--ink);transition:opacity .25s}
+.app__link:hover{opacity:.55}
 .service__num{color:var(--accent);margin-bottom:16px}
 .service ul{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px 20px}
 .service li{color:var(--cream-60);font-size:15px;display:flex;gap:.5em}
