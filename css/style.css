@@ -133,36 +133,103 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .menu{
   position:fixed;inset:0;z-index:60;
   background:var(--ink);color:var(--cream);
-  display:flex;flex-direction:column;justify-content:center;
-  padding:clamp(80px,12vh,140px) var(--pad) clamp(32px,6vh,64px);
+  padding:clamp(72px,10vh,110px) var(--pad) clamp(28px,5vh,56px);
+  overflow-y:auto;
   opacity:0;transition:opacity .4s ease;
 }
 .menu[hidden]{display:none}
 .menu.on{opacity:1}
 
-.menu__list{display:flex;flex-direction:column;gap:clamp(2px,.6vw,10px)}
+.menu__close{
+  position:absolute;top:clamp(18px,3vh,34px);right:var(--pad);
+  width:52px;height:52px;border-radius:999px;border:1px solid var(--cream-12);
+  display:grid;place-content:center;color:var(--cream);
+  transition:border-color .3s,background-color .3s,color .3s,transform .4s cubic-bezier(.2,.7,.3,1);
+}
+.menu__close:hover{background:var(--accent);color:var(--ink);border-color:var(--accent);transform:rotate(90deg)}
+
+.menu__grid{
+  max-width:var(--maxw);margin:0 auto;height:100%;
+  display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.6fr) minmax(0,.55fr);
+  gap:clamp(24px,4vw,64px);align-items:center;
+}
+
+/* --- ліва колонка: монограма з блиском --- */
+.menu__side{display:flex;flex-direction:column;justify-content:center;gap:28px}
+.menu__mark{
+  position:relative;display:inline-block;align-self:flex-start;
+  font-family:var(--display);font-weight:800;letter-spacing:-.06em;
+  font-size:clamp(6rem,15vw,16rem);line-height:.8;
+  color:var(--accent);
+}
+/* Другий шар тим самим текстом: по ньому їде сріблястий блік.
+   Саме тому потрібен окремий шар — інакше довелось би зробити
+   основний текст прозорим і жовтий колір зник би. */
+.menu__mark::after{
+  content:attr(data-text);
+  position:absolute;inset:0;
+  background:linear-gradient(100deg,
+    transparent 42%,rgba(255,255,255,.92) 50%,transparent 58%);
+  background-size:260% 100%;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+  animation:mark-shine 3.6s linear infinite;
+}
+@keyframes mark-shine{
+  from{background-position:170% 0}
+  to{background-position:-70% 0}
+}
+.menu__side-cap{color:var(--cream-40);line-height:1.8}
+
+/* --- середня колонка: пункти --- */
+.menu__list{display:flex;flex-direction:column}
 .menu__list a{
-  display:flex;align-items:baseline;gap:clamp(12px,2vw,28px);
-  font-family:var(--display);font-weight:800;text-transform:uppercase;
-  font-size:clamp(1.7rem,5.4vw,4.4rem);line-height:1.1;letter-spacing:-.03em;
-  padding:.08em .3em;margin-left:-.3em;border-radius:6px;
-  opacity:0;transform:translateY(18px);
-  transition:background-color .35s,color .35s,padding-left .35s,
-             opacity .5s ease,transform .5s cubic-bezier(.2,.7,.3,1);
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;gap:clamp(14px,2vw,30px);
+  padding:clamp(12px,1.6vh,20px) 0;
+  border-bottom:1px solid var(--cream-12);
+  opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s cubic-bezier(.2,.7,.3,1),color .3s;
 }
 .menu.on .menu__list a{opacity:1;transform:none}
-.menu__list a:hover{background:var(--accent);color:var(--ink);padding-left:.55em}
+.menu__label{
+  font-family:var(--display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(1.4rem,3.6vw,3rem);line-height:1.05;letter-spacing:-.03em;
+  transition:transform .4s cubic-bezier(.2,.7,.3,1),color .3s;
+}
+.menu__list a:hover .menu__label{color:var(--accent);transform:translateX(10px)}
 .menu__num{
   font-family:var(--mono);font-size:11px;letter-spacing:.2em;
-  opacity:.4;align-self:flex-start;margin-top:.9em;
+  color:var(--cream-40);transition:color .3s;
 }
-.menu__foot{
-  display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,40px);
-  margin-top:auto;padding-top:32px;border-top:1px solid var(--cream-12);
-  color:var(--cream-60);
+.menu__list a:hover .menu__num{color:var(--accent)}
+.menu__arrow{
+  color:var(--cream-40);
+  opacity:0;transform:translateX(-8px);
+  transition:opacity .35s,transform .4s cubic-bezier(.2,.7,.3,1),color .3s;
 }
-.menu__foot a{transition:color .25s}
-.menu__foot a:hover{color:var(--accent)}
+.menu__list a:hover .menu__arrow{opacity:1;transform:none;color:var(--accent)}
+
+/* --- права колонка: контакти --- */
+.menu__aside{
+  display:flex;flex-direction:column;gap:10px;
+  align-self:center;color:var(--cream-60);
+}
+.menu__aside a{transition:color .25s}
+.menu__aside a:hover{color:var(--accent)}
+.menu__aside-gap{height:clamp(14px,2vh,26px)}
+.menu__aside-note{color:var(--cream-40);line-height:2}
+
+@media (max-width:1100px){
+  .menu__grid{grid-template-columns:minmax(0,1fr) minmax(0,.5fr);align-items:start}
+  .menu__side{display:none}
+}
+@media (max-width:720px){
+  .menu__grid{grid-template-columns:minmax(0,1fr);gap:28px}
+  .menu__aside{flex-direction:row;flex-wrap:wrap;gap:12px 20px}
+  .menu__aside-gap{display:none}
+  .menu__aside-note{width:100%}
+}
 
 /* --- свій курсор ----------------------------------------------------------
    Три шари: точка йде точно за мишею, кільце трохи відстає, ледь помітний
@@ -315,15 +382,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   /* нахил задає JS за напрямком руху миші */
   transform:translate3d(var(--x),var(--y),0) translate(-50%,-50%) rotate(var(--r));
 }
-.case-preview__btn{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
-  width:clamp(84px,7vw,104px);aspect-ratio:1;border-radius:50%;
-  display:grid;place-content:center;text-align:center;line-height:1.35;
-  background:var(--accent);color:var(--ink);
-  font-size:9px;letter-spacing:.14em;
-  opacity:0;transition:opacity .35s ease,transform .45s cubic-bezier(.2,.7,.3,1);
-}
-.case-preview.on .case-preview__btn{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .case-preview img{
   width:100%;display:block;border-radius:10px;
   box-shadow:0 24px 60px rgba(0,0,0,.35);

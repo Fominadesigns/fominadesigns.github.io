@@ -189,40 +189,61 @@
     var img = preview.querySelector('img');
     var px = 0, py = 0, pticking = false;
 
-    var prevX = 0, tilt = 0;
+    // Прев'ю не стрибає за мишею, а плавно її наздоганяє: цільову точку
+    // задає курсор, а сама картка щокадру підтягується до неї частками.
+    // Нахил рахуємо з того, наскільки швидко вона зараз рухається.
+    var targetX = 0, targetY = 0;
+    var curX = 0, curY = 0;
+    var tilt = 0;
+    var running = false;
 
-    function place() {
-      preview.style.setProperty('--x', px + 'px');
-      preview.style.setProperty('--y', py + 'px');
+    function follow() {
+      var dx = targetX - curX;
+      var dy = targetY - curY;
+
+      curX += dx * 0.12;
+      curY += dy * 0.12;
+
+      // нахил від горизонтальної швидкості, з поверненням у нуль
+      var wanted = Math.max(-12, Math.min(12, dx * 0.14));
+      tilt += (wanted - tilt) * 0.08;
+
+      preview.style.setProperty('--x', curX.toFixed(1) + 'px');
+      preview.style.setProperty('--y', curY.toFixed(1) + 'px');
       preview.style.setProperty('--r', tilt.toFixed(2) + 'deg');
-      pticking = false;
+
+      // крутимось, поки прев'ю видиме або ще не доїхало
+      if (preview.classList.contains('on') ||
+          Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+        requestAnimationFrame(follow);
+      } else {
+        running = false;
+      }
     }
 
     function onMove(e) {
       // зсув від курсора, щоб прев'ю не перекривало саму назву
-      px = e.clientX + 40;
-      py = e.clientY;
+      targetX = e.clientX + 40;
+      targetY = e.clientY;
 
-      // Нахил за напрямком руху: різко вправо — нахиляється вправо,
-      // зупинився — плавно вирівнюється.
-      var dx = e.clientX - prevX;
-      prevX = e.clientX;
-      var target = Math.max(-14, Math.min(14, dx * 0.9));
-      tilt += (target - tilt) * 0.25;
-
-      if (!pticking) {
-        pticking = true;
-        requestAnimationFrame(place);
+      if (!running) {
+        running = true;
+        requestAnimationFrame(follow);
       }
     }
 
-    // коли миша стоїть, повертаємо прев'ю в рівне положення
-    setInterval(function () {
-      if (!preview.classList.contains('on')) { return; }
-      if (Math.abs(tilt) < 0.05) { return; }
-      tilt *= 0.82;
-      place();
-    }, 60);
+    function jumpTo(e) {
+      // при першій появі ставимо картку одразу на місце,
+      // інакше вона прилітала б через пів екрана
+      targetX = e.clientX + 40;
+      targetY = e.clientY;
+      curX = targetX;
+      curY = targetY;
+      tilt = 0;
+      preview.style.setProperty('--x', curX + 'px');
+      preview.style.setProperty('--y', curY + 'px');
+      preview.style.setProperty('--r', '0deg');
+    }
 
     Array.prototype.forEach.call(cases, function (link) {
       var src = link.getAttribute('data-preview');
@@ -234,8 +255,9 @@
       link.addEventListener('mouseenter', function (e) {
         img.src = src;
         img.alt = '';
-        onMove(e);
+        jumpTo(e);
         preview.classList.add('on');
+        onMove(e);
       });
 
       link.addEventListener('mousemove', onMove);
