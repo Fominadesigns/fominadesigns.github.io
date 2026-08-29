@@ -141,6 +141,11 @@
     }
 
     function measure() {
+      // Поки відкрито перегляд на весь екран, сторінка має overflow:hidden —
+      // ширини стають іншими, і перемірювання зсунуло б сторінку під ним.
+      var open = document.getElementById('viewer');
+      if (open && !open.hidden) { return; }
+
       // На вузьких екранах і за увімкненого зменшення руху лишаємо звичайну
       // горизонтальну прокрутку — там закріплення радше заважає.
       if (reduceMotion) { disable('reduced-motion'); return; }
@@ -155,8 +160,10 @@
       // offsetWidth разом із width:max-content дає її завжди, і зсув
       // доріжки на нього не впливає.
       var vs = getComputedStyle(viewport);
-      var visible = viewport.clientWidth -
-        (parseFloat(vs.paddingLeft) || 0) - (parseFloat(vs.paddingRight) || 0);
+      var padX = (parseFloat(vs.paddingLeft) || 0) + (parseFloat(vs.paddingRight) || 0);
+      // Обмежуємо шириною екрана: якщо вікно перегляду раптом ширше за
+      // екран, вимірювання дало б нуль і стан почав би блимати.
+      var visible = Math.min(viewport.clientWidth, window.innerWidth) - padX;
       var overflow = track.offsetWidth - visible;
       if (overflow <= 40) { disable('no-overflow'); return; }
 

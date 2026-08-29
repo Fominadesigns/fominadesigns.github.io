@@ -284,7 +284,14 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   position:sticky;top:0;height:100svh;
   display:flex;align-items:center;overflow:hidden;padding:0;
 }
-.works--pinned .works__viewport{overflow:visible;padding:0 var(--pad)}
+/* width і min-width обов'язкові: без них вікно перегляду — гнучкий
+   елемент без заданої ширини — розтягується під ширину вмісту, і
+   вимірювання починає давати «нема чого прокручувати». Стан тоді
+   перемикається туди-сюди по колу. */
+.works--pinned .works__viewport{
+  overflow:hidden;padding:0 var(--pad);
+  flex:0 0 100%;width:100%;min-width:0;
+}
 .works--pinned .works__track{will-change:transform}
 .works--pinned .works__hint--free{display:none}
 .works--pinned .works__hint--pinned{display:flex}
