@@ -25,6 +25,141 @@
     });
   }
 
+  /* --- повноекранне меню -------------------------------------------------- */
+  var burger = document.getElementById('burger');
+  var menuBox = document.getElementById('menu');
+
+  if (burger && menuBox) {
+    var menuLinks = menuBox.querySelectorAll('.menu__list a');
+    var lastFocus = null;
+
+    function openMenu() {
+      lastFocus = document.activeElement;
+      menuBox.hidden = false;
+      // сходинка появи для кожного пункту
+      Array.prototype.forEach.call(menuLinks, function (a, i) {
+        a.style.transitionDelay = (0.06 * i + 0.08) + 's';
+      });
+      void menuBox.offsetWidth;
+      menuBox.classList.add('on');
+      burger.setAttribute('aria-expanded', 'true');
+      burger.setAttribute('aria-label', 'Закрити меню');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeMenu() {
+      menuBox.classList.remove('on');
+      burger.setAttribute('aria-expanded', 'false');
+      burger.setAttribute('aria-label', 'Відкрити меню');
+      document.body.style.overflow = '';
+      Array.prototype.forEach.call(menuLinks, function (a) { a.style.transitionDelay = '0s'; });
+      setTimeout(function () { menuBox.hidden = true; }, 400);
+      if (lastFocus && lastFocus.focus) { lastFocus.focus(); }
+    }
+
+    burger.addEventListener('click', function () {
+      if (menuBox.hidden) { openMenu(); } else { closeMenu(); }
+    });
+
+    menuBox.addEventListener('click', function (e) {
+      if (e.target.closest('a')) { closeMenu(); }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !menuBox.hidden) { closeMenu(); }
+    });
+  }
+
+  /* --- свій курсор -------------------------------------------------------- */
+  var cursor = document.getElementById('cursor');
+  var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  if (cursor && fine && !reduceMotion) {
+    document.documentElement.classList.add('has-cursor');
+
+    var dot = cursor.querySelector('.cursor__dot');
+    var ring = cursor.querySelector('.cursor__ring');
+    var tail = cursor.querySelector('.cursor__trail');
+
+    var mx = window.innerWidth / 2, my = window.innerHeight / 2;
+    var rx = mx, ry = my, tx = mx, ty = my;
+
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX; my = e.clientY;
+    }, { passive: true });
+
+    // кільце й слід наздоганяють точку з різною швидкістю
+    (function loop() {
+      rx += (mx - rx) * 0.18;
+      ry += (my - ry) * 0.18;
+      tx += (mx - tx) * 0.08;
+      ty += (my - ty) * 0.08;
+
+      dot.style.transform = 'translate(' + mx + 'px,' + my + 'px) translate(-50%,-50%)';
+      ring.style.transform = 'translate(' + rx + 'px,' + ry + 'px) translate(-50%,-50%)';
+      tail.style.transform = 'translate(' + tx + 'px,' + ty + 'px) translate(-50%,-50%)';
+
+      requestAnimationFrame(loop);
+    })();
+
+    // над клікабельним кільце розростається
+    document.addEventListener('mouseover', function (e) {
+      if (e.target.closest('a, button, .work__frame, .case')) {
+        cursor.classList.add('is-active');
+      }
+    });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target.closest('a, button, .work__frame, .case')) {
+        cursor.classList.remove('is-active');
+      }
+    });
+  }
+
+  /* --- перебір символів при наведенні --------------------------------------
+     Текст перемішується і складається у правильний. Вішається на елементи
+     з атрибутом data-scramble. Оригінал зберігаємо, щоб нічого не загубити. */
+
+  var scrambles = document.querySelectorAll('[data-scramble]');
+
+  if (scrambles.length && !reduceMotion) {
+    var CHARS = '0123456789+()–—/\\|<>*#@$%&';
+
+    Array.prototype.forEach.call(scrambles, function (el) {
+      var original = el.textContent;
+      var timer = null;
+
+      el.addEventListener('mouseenter', function () {
+        var step = 0;
+        // кожен символ «застигає» на своєму кроці, зліва направо
+        var settleAt = original.split('').map(function (_, i) {
+          return i * 1.6 + Math.random() * 6;
+        });
+
+        clearInterval(timer);
+        timer = setInterval(function () {
+          var out = '';
+          for (var i = 0; i < original.length; i++) {
+            var ch = original[i];
+            if (ch === ' ') { out += ' '; continue; }
+            out += step > settleAt[i] ? ch : CHARS[Math.floor(Math.random() * CHARS.length)];
+          }
+          el.textContent = out;
+          step += 1;
+
+          if (step > settleAt[settleAt.length - 1] + 2) {
+            clearInterval(timer);
+            el.textContent = original;
+          }
+        }, 30);
+      });
+
+      el.addEventListener('mouseleave', function () {
+        clearInterval(timer);
+        el.textContent = original;
+      });
+    });
+  }
+
   /* --- поява блоків при скролі ------------------------------------------- */
   var targets = document.querySelectorAll('.section .wrap > *');
 
@@ -54,9 +189,12 @@
     var img = preview.querySelector('img');
     var px = 0, py = 0, pticking = false;
 
+    var prevX = 0, tilt = 0;
+
     function place() {
       preview.style.setProperty('--x', px + 'px');
       preview.style.setProperty('--y', py + 'px');
+      preview.style.setProperty('--r', tilt.toFixed(2) + 'deg');
       pticking = false;
     }
 
@@ -64,11 +202,27 @@
       // зсув від курсора, щоб прев'ю не перекривало саму назву
       px = e.clientX + 40;
       py = e.clientY;
+
+      // Нахил за напрямком руху: різко вправо — нахиляється вправо,
+      // зупинився — плавно вирівнюється.
+      var dx = e.clientX - prevX;
+      prevX = e.clientX;
+      var target = Math.max(-14, Math.min(14, dx * 0.9));
+      tilt += (target - tilt) * 0.25;
+
       if (!pticking) {
         pticking = true;
         requestAnimationFrame(place);
       }
     }
+
+    // коли миша стоїть, повертаємо прев'ю в рівне положення
+    setInterval(function () {
+      if (!preview.classList.contains('on')) { return; }
+      if (Math.abs(tilt) < 0.05) { return; }
+      tilt *= 0.82;
+      place();
+    }, 60);
 
     Array.prototype.forEach.call(cases, function (link) {
       var src = link.getAttribute('data-preview');

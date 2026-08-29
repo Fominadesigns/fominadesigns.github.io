@@ -112,6 +112,84 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .nav__toggle{display:none;margin-left:auto;padding:8px;font-family:var(--mono);font-size:11px;
   letter-spacing:.16em;text-transform:uppercase;color:var(--cream)}
 
+/* --- кнопка меню й повноекранне меню --------------------------------------
+   Уся навігація живе в накладанні, тому шапка більше не може обрізатись,
+   скільки б пунктів ми не додали. */
+.nav__cta{margin-left:auto}
+.burger{
+  width:52px;height:52px;flex:0 0 auto;border-radius:999px;
+  border:1px solid var(--cream-12);
+  display:grid;place-content:center;gap:6px;
+  transition:border-color .3s,background-color .3s;
+}
+.burger:hover{border-color:var(--accent)}
+.burger span{
+  display:block;width:20px;height:1.5px;background:var(--cream);
+  transition:transform .35s cubic-bezier(.2,.7,.3,1),opacity .25s;
+}
+.burger[aria-expanded="true"] span:first-child{transform:translateY(3.75px) rotate(45deg)}
+.burger[aria-expanded="true"] span:last-child{transform:translateY(-3.75px) rotate(-45deg)}
+
+.menu{
+  position:fixed;inset:0;z-index:60;
+  background:var(--ink);color:var(--cream);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:clamp(80px,12vh,140px) var(--pad) clamp(32px,6vh,64px);
+  opacity:0;transition:opacity .4s ease;
+}
+.menu[hidden]{display:none}
+.menu.on{opacity:1}
+
+.menu__list{display:flex;flex-direction:column;gap:clamp(2px,.6vw,10px)}
+.menu__list a{
+  display:flex;align-items:baseline;gap:clamp(12px,2vw,28px);
+  font-family:var(--display);font-weight:800;text-transform:uppercase;
+  font-size:clamp(1.7rem,5.4vw,4.4rem);line-height:1.1;letter-spacing:-.03em;
+  padding:.08em .3em;margin-left:-.3em;border-radius:6px;
+  opacity:0;transform:translateY(18px);
+  transition:background-color .35s,color .35s,padding-left .35s,
+             opacity .5s ease,transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.menu.on .menu__list a{opacity:1;transform:none}
+.menu__list a:hover{background:var(--accent);color:var(--ink);padding-left:.55em}
+.menu__num{
+  font-family:var(--mono);font-size:11px;letter-spacing:.2em;
+  opacity:.4;align-self:flex-start;margin-top:.9em;
+}
+.menu__foot{
+  display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,40px);
+  margin-top:auto;padding-top:32px;border-top:1px solid var(--cream-12);
+  color:var(--cream-60);
+}
+.menu__foot a{transition:color .25s}
+.menu__foot a:hover{color:var(--accent)}
+
+/* --- свій курсор ----------------------------------------------------------
+   Три шари: точка йде точно за мишею, кільце трохи відстає, ледь помітний
+   слід — ще більше. Вмикається лише там, де є справжній курсор. */
+.cursor{display:none}
+@media (hover:hover) and (pointer:fine){
+  .has-cursor,.has-cursor *{cursor:none}
+  .cursor{display:block;position:fixed;top:0;left:0;z-index:200;pointer-events:none}
+  .cursor span{position:absolute;border-radius:50%;transform:translate(-50%,-50%)}
+  .cursor__dot{width:6px;height:6px;background:var(--accent)}
+  .cursor__ring{
+    width:34px;height:34px;border:1.5px solid rgba(249,254,74,.45);
+    transition:width .45s cubic-bezier(.16,1,.3,1),height .45s cubic-bezier(.16,1,.3,1),
+               border-color .3s,background-color .3s;
+  }
+  .cursor__trail{width:72px;height:72px;border:1px solid rgba(249,254,74,.12)}
+  /* над посиланням і кнопкою кільце розростається */
+  .cursor.is-active .cursor__ring{
+    width:62px;height:62px;border-color:rgba(249,254,74,.9);
+    background:rgba(249,254,74,.08);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .has-cursor,.has-cursor *{cursor:auto}
+  .cursor{display:none!important}
+}
+
 /* --- кнопки --------------------------------------------------------------- */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:.6em;
@@ -243,11 +321,21 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 
 /* спливаюче прев’ю за курсором */
 .case-preview{
-  --x:0px;--y:0px;
+  --x:0px;--y:0px;--r:0deg;
   position:fixed;top:0;left:0;z-index:40;pointer-events:none;
   width:clamp(260px,26vw,400px);
-  transform:translate3d(var(--x),var(--y),0) translate(-50%,-50%);
+  /* нахил задає JS за напрямком руху миші */
+  transform:translate3d(var(--x),var(--y),0) translate(-50%,-50%) rotate(var(--r));
 }
+.case-preview__btn{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  width:clamp(84px,7vw,104px);aspect-ratio:1;border-radius:50%;
+  display:grid;place-content:center;text-align:center;line-height:1.35;
+  background:var(--accent);color:var(--ink);
+  font-size:9px;letter-spacing:.14em;
+  opacity:0;transition:opacity .35s ease,transform .45s cubic-bezier(.2,.7,.3,1);
+}
+.case-preview.on .case-preview__btn{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .case-preview img{
   width:100%;display:block;border-radius:10px;
   box-shadow:0 24px 60px rgba(0,0,0,.35);
@@ -307,10 +395,48 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .service li::before{content:"—";color:var(--accent);opacity:.7}
 
 /* --- процес --------------------------------------------------------------- */
-.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(16px,2vw,28px)}
-.step{min-width:0;padding-top:20px;border-top:2px solid var(--ink)}
+/* Картки прилипають одна під одною зі зростаючим відступом — і
+   складаються стосом під час прокрутки. Жодного скрипта. */
+.steps{display:flex;flex-direction:column;gap:clamp(16px,2vw,24px)}
+.step{
+  position:sticky;top:calc(96px + var(--i) * 14px);
+  min-width:0;padding:clamp(24px,3vw,40px);
+  background:var(--cream);border:1px solid var(--ink-12);border-radius:16px;
+  box-shadow:0 -2px 24px rgba(10,10,10,.05);
+}
 .step__when{color:var(--ink-40);margin-bottom:14px}
-.step p{margin-top:10px;color:var(--ink-60);font-size:15px}
+.step h3{font-size:clamp(1.3rem,2.6vw,2rem);text-transform:uppercase}
+.step p{margin-top:12px;color:var(--ink-60);font-size:15px;max-width:60ch}
+
+/* --- питання-відповіді ----------------------------------------------------
+   На <details>/<summary>: працює й без скрипта, читається з клавіатури.
+   Розкриття анімуємо через grid-template-rows — це єдиний спосіб плавно
+   анімувати висоту, що заздалегідь невідома. */
+.faq{border-top:1px solid var(--ink-12)}
+.faq__item{border-bottom:1px solid var(--ink-12)}
+.faq__item summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:clamp(20px,2.4vw,30px) 0;
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(1.05rem,2vw,1.6rem);letter-spacing:-.02em;
+  transition:color .3s;
+}
+.faq__item summary::-webkit-details-marker{display:none}
+.faq__item summary::after{
+  content:"";flex:0 0 auto;width:16px;height:16px;
+  background:linear-gradient(var(--ink),var(--ink)) center/100% 1.5px no-repeat,
+             linear-gradient(var(--ink),var(--ink)) center/1.5px 100% no-repeat;
+  transition:transform .35s cubic-bezier(.2,.7,.3,1);
+}
+.faq__item[open] summary::after{transform:rotate(135deg)}
+.faq__item summary:hover{color:var(--ink-60)}
+.faq__body{
+  display:grid;grid-template-rows:1fr;
+  padding-bottom:clamp(18px,2vw,28px);
+  color:var(--ink-60);max-width:70ch;
+}
+.faq__body p{overflow:hidden}
 
 /* --- ціни ----------------------------------------------------------------- */
 .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(16px,2vw,24px)}

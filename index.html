@@ -15,26 +15,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;600;800&family=Cormorant:ital,wght@1,300;1,400&family=Wix+Madefor+Display:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
-<link href="css/style.css?v=14" rel="stylesheet">
+<link href="css/style.css?v=15" rel="stylesheet">
 </head>
 <body>
 
 <header class="nav">
   <a href="#hero" class="nav__logo">Fomina.<br>Designs</a>
-  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">Меню</button>
-  <nav class="nav__menu" id="navMenu">
-    <a href="#cases" class="nav__link">Кейси</a>
-    <a href="#services" class="nav__link">Послуги</a>
-    <a href="#apps" class="nav__link">Міні-додатки</a>
-    <a href="#process" class="nav__link">Процес</a>
-    <a href="#prices" class="nav__link">Ціни</a>
-    <a href="#gallery" class="nav__link">Галерея</a>
-    <a href="#about" class="nav__link">Про мене</a>
-    <a href="chi-vtrachaie-vash-biznes-kliientiv-bez-saytu-kviz-za-3-hvilini.html" class="nav__link">Квіз</a>
-  </nav>
-  <a href="tel:+380507893064" class="nav__phone">+38 (050) 789 30 64</a>
-  <a href="https://t.me/fominadesigns" target="_blank" rel="noopener" class="btn btn--accent">Замовити</a>
+  <a href="https://t.me/fominadesigns" target="_blank" rel="noopener" class="btn btn--accent nav__cta">Замовити</a>
+  <button class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Відкрити меню">
+    <span></span><span></span>
+  </button>
 </header>
+
+<!-- Повноекранне меню -->
+<div class="menu" id="menu" hidden>
+  <nav class="menu__list" aria-label="Головне меню">
+    <a href="#cases"><span class="menu__num">01</span>Кейси</a>
+    <a href="#services"><span class="menu__num">02</span>Послуги</a>
+    <a href="#apps"><span class="menu__num">03</span>Міні-додатки</a>
+    <a href="#process"><span class="menu__num">04</span>Процес</a>
+    <a href="#prices"><span class="menu__num">05</span>Ціни</a>
+    <a href="#gallery"><span class="menu__num">06</span>Креативи</a>
+    <a href="#faq"><span class="menu__num">07</span>Питання</a>
+    <a href="#about"><span class="menu__num">08</span>Про мене</a>
+  </nav>
+  <div class="menu__foot">
+    <a href="tel:+380507893064" class="mono" data-scramble>+38 (050) 789 30 64</a>
+    <a href="chi-vtrachaie-vash-biznes-kliientiv-bez-saytu-kviz-za-3-hvilini.html" class="mono">Пройти квіз</a>
+    <a href="https://t.me/fominadesigns" target="_blank" rel="noopener" class="mono">Telegram</a>
+  </div>
+</div>
 
 <!-- ============================ ПЕРШИЙ ЕКРАН ============================ -->
 <section id="hero" class="section dark hero">
@@ -49,11 +59,12 @@
       <img class="trail__img" src="images/trail/08.webp" alt="" aria-hidden="true">
     </div>
   <div class="wrap">
-    <p class="mono hero__label">[ Digital-дизайн · Сайти під ключ ]</p>
+    <p class="mono hero__label">[ Digital-дизайн для бізнесу ]</p>
     <h1 class="hero__title">Сайти, <span class="soft">які працюють</span><br>на продажі</h1>
     <p class="hero__lead">
-      Дизайн, адаптивна верстка й рекламний візуал — від однієї людини.
-      Вам не треба збирати трьох підрядників і зводити їх між собою.
+      Головне, що я роблю — <strong>сайти під ключ</strong>. Поруч із ними: міні-додатки
+      в Telegram, креативи для таргету, презентації та оформлення сторінок.
+      Весь візуал бізнесу від однієї людини.
     </p>
     <div class="hero__actions">
       <a href="chi-vtrachaie-vash-biznes-kliientiv-bez-saytu-kviz-za-3-hvilini.html" class="btn btn--accent">Пройти квіз за 3 хвилини</a>
@@ -143,7 +154,10 @@
 
     </div>
   </div>
-  <div class="case-preview" id="casePreview" aria-hidden="true"><img src="" alt=""></div>
+  <div class="case-preview" id="casePreview" aria-hidden="true">
+    <img src="" alt="">
+    <span class="case-preview__btn mono">Дивитись<br>роботу</span>
+  </div>
 </section>
 
 <!-- =============================== ПОСЛУГИ =============================== -->
@@ -236,29 +250,31 @@
 </section>
 
 <!-- =============================== ПРОЦЕС ================================ -->
-<!-- ТЕРМІНИ — ЗАГЛУШКА. Підтвердити або замінити на реальні. -->
+<!-- ТЕРМІНИ — ЗАГЛУШКА. Підтвердити або замінити на реальні.
+     Картки прилипають одна під одною і складаються стосом — це чистий CSS,
+     position:sticky зі зростаючим відступом, без жодного скрипта. -->
 <section id="process" class="section light">
   <div class="wrap">
     <p class="mono section-label">[ 04 ]</p>
     <h2 class="section-title">Як ми <span class="accent">працюємо</span></h2>
     <div class="steps">
-      <article class="step">
-        <p class="mono step__when">Крок 1 · 1–2 дні</p>
+      <article class="step" style="--i:0">
+        <p class="mono step__when">Крок 01 · 1–2 дні</p>
         <h3>Бриф і аналіз</h3>
         <p>Розбираємось, кому й що ви продаєте, дивимось конкурентів, домовляємось про результат.</p>
       </article>
-      <article class="step">
-        <p class="mono step__when">Крок 2 · 2–3 дні</p>
+      <article class="step" style="--i:1">
+        <p class="mono step__when">Крок 02 · 2–3 дні</p>
         <h3>Структура й прототип</h3>
         <p>Збираю логіку сторінок: що бачить відвідувач, у якому порядку і де ухвалює рішення.</p>
       </article>
-      <article class="step">
-        <p class="mono step__when">Крок 3 · 4–7 днів</p>
+      <article class="step" style="--i:2">
+        <p class="mono step__when">Крок 03 · 4–7 днів</p>
         <h3>Дизайн</h3>
         <p>Малюю всі екрани під ваш бренд, включно з мобільною версією. Правки — на цьому етапі.</p>
       </article>
-      <article class="step">
-        <p class="mono step__when">Крок 4 · 3–5 днів</p>
+      <article class="step" style="--i:3">
+        <p class="mono step__when">Крок 04 · 3–5 днів</p>
         <h3>Верстка й запуск</h3>
         <p>Адаптивна верстка, підключення аналітики та форм, перенесення на ваш домен.</p>
       </article>
@@ -422,6 +438,47 @@
   </div>
 </section>
 
+<!-- ========================= ПИТАННЯ-ВІДПОВІДІ ============================ -->
+<!-- ВІДПОВІДІ ПРО ПРАВКИ Й ОПЛАТУ — ЗАГЛУШКИ. Підтвердити або переписати. -->
+<section id="faq" class="section light">
+  <div class="wrap">
+    <p class="mono section-label">[ 06 ]</p>
+    <h2 class="section-title">Питання, які <span class="soft">виникають</span></h2>
+
+    <div class="faq">
+      <details class="faq__item">
+        <summary>Скільки часу займає робота?</summary>
+        <div class="faq__body"><p>Лендинг — орієнтовно два тижні, сайт під ключ — три-чотири. Точний термін називаю після брифу: він залежить від кількості сторінок і від того, чи готові тексти й матеріали.</p></div>
+      </details>
+
+      <details class="faq__item">
+        <summary>Що потрібно від мене на старті?</summary>
+        <div class="faq__body"><p>Розповісти про бізнес: кому продаєте, чим відрізняєтесь, які заперечення чуєте найчастіше. Плюс матеріали — фото, логотип, тексти, якщо є. Якщо текстів немає, зберемо структуру разом.</p></div>
+      </details>
+
+      <details class="faq__item">
+        <summary>Скільки правок входить у роботу?</summary>
+        <div class="faq__body"><p>Правки вношу на етапі дизайну, доки не погодимо макет. Після початку верстки зміни структури обговорюємо окремо — щоб не зривати термін.</p></div>
+      </details>
+
+      <details class="faq__item">
+        <summary>Хто пише тексти?</summary>
+        <div class="faq__body"><p>Структуру й змістові акценти пропоную я — це частина роботи над конверсією. Фактуру про бізнес даєте ви. Якщо потрібен окремий копірайтер, підкажу, коли це справді виправдано.</p></div>
+      </details>
+
+      <details class="faq__item">
+        <summary>Що буде після запуску?</summary>
+        <div class="faq__body"><p>Передаю сайт на ваш домен і показую, як вносити прості зміни. Якщо потрібні доробки згодом — повертайтесь, працюємо далі.</p></div>
+      </details>
+
+      <details class="faq__item">
+        <summary>Чи можна замовити тільки креативи або презентацію?</summary>
+        <div class="faq__body"><p>Так. Сайти — головний напрямок, але креативи для таргету, презентації й оформлення сторінок замовляють і окремо.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- ============================== ПРО МЕНЕ =============================== -->
 <section id="about" class="section dark">
   <div class="wrap">
@@ -472,7 +529,7 @@
       <h2>Потрібен інструмент, <span class="soft">що працює</span>?</h2>
       <a href="https://t.me/fominadesigns" target="_blank" rel="noopener" class="btn btn--accent">Написати</a>
     </div>
-    <a href="tel:+380507893064" class="phone-big">+38 (050) 789 30 64</a>
+    <a href="tel:+380507893064" class="phone-big" data-scramble>+38 (050) 789 30 64</a>
     <div class="footer">
       <a href="#hero" class="nav__logo">Fomina.<br>Designs</a>
       <nav class="footer__links">
@@ -515,6 +572,12 @@
   </button>
 </div>
 
-<script src="js/app.js?v=15"></script>
+<div class="cursor" id="cursor" aria-hidden="true">
+  <span class="cursor__trail"></span>
+  <span class="cursor__ring"></span>
+  <span class="cursor__dot"></span>
+</div>
+
+<script src="js/app.js?v=16"></script>
 </body>
 </html>
