@@ -91,9 +91,9 @@
       });
     });
 
-    // якщо сторінку прокрутили колесом під час ховера — ховаємо прев'ю
-    window.addEventListener('scroll', function () {
-      if (preview.classList.contains('on')) preview.classList.remove('on');
-    }, { passive: true });
+    // Ховати прев'ю на scroll не можна: через scroll-behavior:smooth
+    // залишковий рух сторінки гасив би його одразу після появи,
+    // а на тачпаді воно б блимало. Коли рядок їде з-під курсора,
+    // mouseleave спрацьовує сам.
   }
 })();
