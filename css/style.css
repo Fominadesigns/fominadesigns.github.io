@@ -203,18 +203,91 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .plan .btn{margin-top:auto;align-self:flex-start}
 .plans-note{margin-top:24px;color:var(--ink-40);max-width:60ch}
 
-/* --- галерея -------------------------------------------------------------- */
-.gallery{columns:4;column-gap:clamp(12px,1.6vw,20px)}
-.gallery figure{break-inside:avoid;margin-bottom:clamp(12px,1.6vw,20px);position:relative;overflow:hidden;border-radius:8px}
-.gallery img{width:100%;transition:transform .6s cubic-bezier(.2,.7,.3,1)}
-.gallery figure:hover img{transform:scale(1.04)}
-.gallery figcaption{
-  position:absolute;inset:auto 0 0 0;padding:14px;
-  background:linear-gradient(transparent,rgba(10,10,10,.85));color:var(--cream);
-  font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  opacity:0;transition:opacity .35s;
+/* --- роботи: горизонтальна прокрутка --------------------------------------- */
+
+/* Кут для градієнтної обводки. @property потрібен, щоб кут можна було
+   анімувати — звичайну CSS-змінну браузер анімувати не вміє. */
+@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
+
+.works .wrap{
+  display:grid;grid-template-columns:minmax(240px,26%) minmax(0,1fr);
+  gap:clamp(24px,4vw,64px);align-items:start;
 }
-.gallery figure:hover figcaption{opacity:1}
+.works__intro{position:sticky;top:110px}
+.works__intro p{margin-top:18px;color:var(--ink-60);font-size:15px}
+.works__hint{
+  display:flex;align-items:center;gap:10px;margin-top:24px;color:var(--ink-40);
+}
+.works__hint svg{flex:0 0 auto}
+
+.works__nav{display:flex;gap:8px;margin-top:24px}
+.works__arrow{
+  width:44px;height:44px;border-radius:999px;border:1px solid var(--ink-12);
+  display:grid;place-items:center;
+  transition:border-color .3s,background-color .3s,color .3s,opacity .3s;
+}
+.works__arrow:hover:not(:disabled){background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.works__arrow:disabled{opacity:.25;cursor:default}
+
+/* Доріжка. Прокрутка справжня, тому працює і пальцем, і тачпадом,
+   і клавіатурою — нічого не перехоплюємо. */
+.works__track{
+  display:flex;gap:clamp(12px,1.4vw,20px);
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  padding:4px 4px 22px;margin:-4px -4px 0;
+  scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent;
+  cursor:grab;
+}
+.works__track.dragging{cursor:grabbing;scroll-snap-type:none;user-select:none}
+.works__track::-webkit-scrollbar{height:6px}
+.works__track::-webkit-scrollbar-track{background:transparent}
+.works__track::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
+.works__track::-webkit-scrollbar-thumb:hover{background:var(--ink-40)}
+
+.work{
+  flex:0 0 clamp(190px,22vw,270px);scroll-snap-align:start;
+  position:relative;border-radius:14px;
+  transition:transform .45s cubic-bezier(.2,.7,.3,1);
+}
+.work:hover{transform:translateY(-6px)}
+
+/* Градієнтна обводка: шар під карткою, який перелив ається по колу.
+   Вмикається на ховері, щоб не смикати очі постійним рухом. */
+.work__frame{
+  position:relative;border-radius:14px;overflow:hidden;
+  background:var(--ink);
+  box-shadow:0 2px 8px rgba(10,10,10,.06);
+  transition:box-shadow .45s cubic-bezier(.2,.7,.3,1);
+}
+.work:hover .work__frame{box-shadow:0 18px 40px rgba(10,10,10,.18)}
+.work__frame::before{
+  content:"";position:absolute;inset:-2px;z-index:0;border-radius:16px;
+  background:conic-gradient(from var(--angle),
+    var(--accent),rgba(249,254,74,0) 25%,rgba(249,254,74,0) 75%,var(--accent));
+  opacity:0;transition:opacity .4s;
+}
+.work:hover .work__frame::before{opacity:1;animation:spin-border 3.2s linear infinite}
+@keyframes spin-border{to{--angle:360deg}}
+
+.work__frame img{
+  position:relative;z-index:1;
+  width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:13px;
+  transition:transform .7s cubic-bezier(.2,.7,.3,1),filter .45s;
+  filter:saturate(.92);
+}
+.work:hover .work__frame img{transform:scale(1.05);filter:saturate(1.06)}
+
+.work figcaption{
+  margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-40);transition:color .3s;
+}
+.work:hover figcaption{color:var(--ink)}
+
+/* Якщо браузер не вміє анімувати @property — просто рівна жовта обводка. */
+@supports not (background:conic-gradient(from var(--angle),red,blue)){
+  .work:hover .work__frame::before{background:var(--accent);animation:none}
+}
 
 /* --- про мене ------------------------------------------------------------- */
 .about{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:clamp(28px,5vw,80px);align-items:start}
@@ -263,7 +336,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 /* --- адаптив -------------------------------------------------------------- */
 @media (max-width:1100px){
   .service{grid-column:span 6}
-  .gallery{columns:3}
   .steps{grid-template-columns:repeat(2,1fr)}
 }
 @media (max-width:860px){
@@ -280,7 +352,10 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   .plans{grid-template-columns:1fr}
   .about{grid-template-columns:1fr}
   .about__photo{max-width:280px}
-  .gallery{columns:2}
+  .works .wrap{grid-template-columns:1fr;gap:28px}
+  .works__intro{position:static}
+  .works__nav{display:none}
+  .work{flex:0 0 62vw}
   .case-preview{display:none!important}
   .case{align-items:center;gap:.5em}
   .case__num{margin-top:0}
@@ -300,7 +375,7 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 @media (max-width:560px){
   .service{grid-column:span 12}
   .steps{grid-template-columns:1fr}
-  .gallery{columns:1}
+  .work{flex:0 0 72vw}
 }
 
 /* --- повага до налаштувань руху ------------------------------------------- */

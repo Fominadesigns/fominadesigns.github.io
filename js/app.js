@@ -96,4 +96,72 @@
     // а на тачпаді воно б блимало. Коли рядок їде з-під курсора,
     // mouseleave спрацьовує сам.
   }
+
+  /* --- горизонтальна доріжка робіт --------------------------------------- */
+  var track = document.getElementById('worksTrack');
+  var prev = document.getElementById('worksPrev');
+  var next = document.getElementById('worksNext');
+
+  if (track) {
+    // на скільки гортати стрілкою — ширина картки разом із проміжком
+    function step() {
+      var card = track.querySelector('.work');
+      if (!card) return track.clientWidth;
+      var gap = parseFloat(getComputedStyle(track).columnGap) || 16;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function scrollBy(dir) {
+      track.scrollBy({
+        left: dir * step() * 2,
+        behavior: reduceMotion ? 'auto' : 'smooth'
+      });
+    }
+
+    if (prev) prev.addEventListener('click', function () { scrollBy(-1); });
+    if (next) next.addEventListener('click', function () { scrollBy(1); });
+
+    // гасимо стрілку, коли доїхали до краю
+    function syncArrows() {
+      if (!prev || !next) return;
+      var max = track.scrollWidth - track.clientWidth;
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= max - 2;
+    }
+    track.addEventListener('scroll', syncArrows, { passive: true });
+    window.addEventListener('resize', syncArrows);
+    syncArrows();
+
+    // перетягування мишкою
+    var down = false, startX = 0, startLeft = 0, moved = 0;
+
+    track.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch') return; // палець гортає сам
+      down = true; moved = 0;
+      startX = e.clientX;
+      startLeft = track.scrollLeft;
+      track.classList.add('dragging');
+    });
+
+    track.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX;
+      moved = Math.abs(dx);
+      if (moved > 3) track.setPointerCapture(e.pointerId);
+      track.scrollLeft = startLeft - dx;
+    });
+
+    function endDrag() {
+      if (!down) return;
+      down = false;
+      track.classList.remove('dragging');
+    }
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+
+    // якщо картку тягнули, а не клацнули — не відкриваємо посилання
+    track.addEventListener('click', function (e) {
+      if (moved > 5) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+  }
 })();
