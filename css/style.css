@@ -261,7 +261,10 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 .works__viewport::-webkit-scrollbar{height:6px}
 .works__viewport::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
-.works__track{display:flex;gap:clamp(16px,2vw,32px);align-items:center}
+/* max-content — доріжка завжди має справжню ширину вмісту: у звичайному
+   режимі це дає горизонтальну прокрутку, у закріпленому — правильне
+   вимірювання шляху. Без цього перше вимірювання бачить ширину екрана. */
+.works__track{display:flex;gap:clamp(16px,2vw,32px);align-items:center;width:max-content}
 
 /* заголовок — перша комірка доріжки, тому їде разом із роботами */
 .works__intro{flex:0 0 clamp(260px,28vw,380px);padding-right:clamp(8px,2vw,24px)}
@@ -282,9 +285,7 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   display:flex;align-items:center;overflow:hidden;padding:0;
 }
 .works--pinned .works__viewport{overflow:visible;padding:0 var(--pad)}
-/* max-content — щоб доріжка мала справжню ширину вмісту,
-   інакше її неможливо правильно виміряти в закріпленому стані */
-.works--pinned .works__track{will-change:transform;width:max-content}
+.works--pinned .works__track{will-change:transform}
 .works--pinned .works__hint--free{display:none}
 .works--pinned .works__hint--pinned{display:flex}
 .works--pinned .works__progress{opacity:1}
