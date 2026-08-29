@@ -250,13 +250,14 @@
         (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(.82)';
       el.style.opacity = '0';
 
-      // наступний кадр — вмикаємо перехід і показуємо
-      requestAnimationFrame(function () {
-        el.style.transition = 'opacity .35s ease, transform .7s cubic-bezier(.2,.7,.3,1)';
-        el.style.opacity = '1';
-        el.style.transform = 'translate3d(' + (x - el.offsetWidth / 2) + 'px,' +
-          (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(1)';
-      });
+      // Примусовий перерахунок, а не requestAnimationFrame: rAF не
+      // спрацьовує у прихованій вкладці, і картинка лишалась невидимою.
+      void el.offsetWidth;
+
+      el.style.transition = 'opacity .35s ease, transform .7s cubic-bezier(.2,.7,.3,1)';
+      el.style.opacity = '1';
+      el.style.transform = 'translate3d(' + (x - el.offsetWidth / 2) + 'px,' +
+        (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(1)';
 
       // і гасимо через паузу
       clearTimeout(el._hide);
