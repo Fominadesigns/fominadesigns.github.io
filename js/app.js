@@ -213,6 +213,79 @@
     measure();
   }
 
+  /* --- слід із робіт за курсором ------------------------------------------
+
+     Коли курсор проходить певну відстань, показуємо наступну картинку
+     у місці курсора й гасимо її. Виходить «шлейф» із робіт.
+     Тільки для миші: на тачі курсора немає, а зайвий рух дратує.        */
+
+  var trail = document.getElementById('trail');
+
+  if (trail && hasHover && !reduceMotion) {
+    var shots = trail.querySelectorAll('.trail__img');
+    var count = shots.length;
+    var idx = 0;
+    var lastX = 0, lastY = 0;
+    var started = false;
+    var zIndex = 1;
+
+    // на якій відстані показувати наступну картинку
+    var STEP = 120;
+
+    function distance(x1, y1, x2, y2) {
+      var dx = x2 - x1, dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function pop(x, y) {
+      var el = shots[idx % count];
+      idx += 1;
+      zIndex += 1;
+
+      el.style.zIndex = zIndex;
+      // невеликий випадковий нахил, щоб слід не був механічним
+      var tilt = (Math.random() * 16 - 8).toFixed(1);
+      el.style.transition = 'none';
+      el.style.transform = 'translate3d(' + (x - el.offsetWidth / 2) + 'px,' +
+        (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(.82)';
+      el.style.opacity = '0';
+
+      // наступний кадр — вмикаємо перехід і показуємо
+      requestAnimationFrame(function () {
+        el.style.transition = 'opacity .35s ease, transform .7s cubic-bezier(.2,.7,.3,1)';
+        el.style.opacity = '1';
+        el.style.transform = 'translate3d(' + (x - el.offsetWidth / 2) + 'px,' +
+          (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(1)';
+      });
+
+      // і гасимо через паузу
+      clearTimeout(el._hide);
+      el._hide = setTimeout(function () {
+        el.style.transition = 'opacity .6s ease, transform .6s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'translate3d(' + (x - el.offsetWidth / 2) + 'px,' +
+          (y - el.offsetHeight / 2) + 'px,0) rotate(' + tilt + 'deg) scale(.94)';
+      }, 650);
+    }
+
+    trail.parentElement.addEventListener('mousemove', function (e) {
+      var box = trail.getBoundingClientRect();
+      var x = e.clientX - box.left;
+      var y = e.clientY - box.top;
+
+      if (!started) {
+        started = true;
+        lastX = x; lastY = y;
+        return;
+      }
+
+      if (distance(lastX, lastY, x, y) > STEP) {
+        lastX = x; lastY = y;
+        pop(x, y);
+      }
+    });
+  }
+
   /* --- діагностика ---------------------------------------------------------
      Вмикається лише адресою ?debug — на звичайному сайті нічого не показує.
      Потрібна, щоб побачити реальні розміри на чужому екрані, який не
