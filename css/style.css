@@ -4,9 +4,11 @@
    ========================================================================== */
 
 :root{
-  /* Яскравість переливу на всю сторінку. 0 — вимкнено.
-     Понад 0.45 починає помітно чіпати читабельність тексту. */
-  --sheen:.3;
+  /* Яскравість переливу. Два числа, бо шари різні:
+     перший видно на темних секціях, другий — на світлих.
+     0 вимикає. Понад 0.2 починає чіпати читабельність. */
+  --sheen-dark:.15;
+  --sheen-light:.1;
 
   --cream:#F3F3EF;
   --ink:#0A0A0A;
@@ -43,21 +45,24 @@ ul{list-style:none}
 @supports (overflow:clip){html,body{overflow-x:clip}}
 
 /* --- перелив на всю сторінку ----------------------------------------------
-   Плівка поверх сторінки з мʼяким накладанням: підкрашує, але не
-   перемальовує кольори. Лежить нижче шапки, меню, курсора й превʼю,
-   тому вони лишаються чистими. Кліки не перехоплює. */
+   Один режим накладання не може працювати і на майже чорному, і на
+   кремовому: soft-light на обох краях яскравості майже не діє. Тому
+   шари два. Перший освітлює — його видно на темних секціях. Другий
+   підфарбовує — його видно на світлих. Обидва нижче шапки, меню,
+   курсора й превʼю і не перехоплюють кліки. */
 .sheen{
   position:fixed;inset:-25%;z-index:5;pointer-events:none;
-  opacity:var(--sheen);
-  mix-blend-mode:soft-light;
+  filter:blur(50px) saturate(130%);
   background:
     radial-gradient(38% 42% at 18% 22%, #F9FE4A 0%, transparent 62%),
-    radial-gradient(34% 38% at 82% 18%, #6FD8FF 0%, transparent 62%),
-    radial-gradient(44% 48% at 72% 78%, #FF8FD8 0%, transparent 62%),
-    radial-gradient(40% 42% at 24% 76%, #8CFFC0 0%, transparent 62%);
-  filter:blur(46px) saturate(125%);
+    radial-gradient(34% 38% at 82% 18%, #4FD0FF 0%, transparent 62%),
+    radial-gradient(44% 48% at 72% 78%, #FF6FCF 0%, transparent 62%),
+    radial-gradient(40% 42% at 24% 76%, #63FFAE 0%, transparent 62%);
   animation:sheen-drift 28s ease-in-out infinite alternate;
 }
+.sheen--lighten{mix-blend-mode:screen;opacity:var(--sheen-dark)}
+.sheen--tint{mix-blend-mode:multiply;opacity:var(--sheen-light);animation-direction:alternate-reverse}
+
 @keyframes sheen-drift{
   0%{transform:translate3d(-3%,-2%,0) rotate(0deg) scale(1.06)}
   50%{transform:translate3d(3%,2%,0) rotate(7deg) scale(1.16)}
