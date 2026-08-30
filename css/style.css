@@ -360,13 +360,19 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 
 /* --- кейси ---------------------------------------------------------------- */
-/* row-gap — щоб чорна плашка на ховері не торкалась сусіднього рядка */
-.cases{display:flex;flex-direction:column;gap:clamp(8px,1.1vw,18px)}
+/* row-gap — щоб чорна плашка на ховері не торкалась сусіднього рядка.
+   perspective — та сама, що була в старій збірці (1500px), щоб глибина
+   нахилу відчувалась так само. */
+.cases{
+  display:flex;flex-direction:column;gap:clamp(8px,1.1vw,18px);
+  perspective:1500px;transform-style:preserve-3d;
+}
 .case{
   position:relative;display:flex;align-items:baseline;gap:.6em;
   font-family:var(--display);font-weight:800;letter-spacing:-.03em;
   font-size:clamp(1.8rem,5.6vw,5rem);line-height:1.16;
   padding:.16em .3em;margin-left:-.3em;border-radius:4px;
+  transform-origin:left center;will-change:transform;
   transition:background-color .45s cubic-bezier(.2,.7,.3,1),color .45s,padding-left .45s;
 }
 .case__num{font-family:var(--mono);font-size:11px;letter-spacing:.2em;opacity:.4;align-self:flex-start;margin-top:1.4em}
@@ -495,8 +501,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 .plan:hover{border-color:var(--ink);transform:translateY(-3px)}
 .plan--featured{background:var(--ink);color:var(--cream);border-color:var(--ink)}
-.plan--featured .plan__price{color:var(--accent)}
-.plan--featured li{color:var(--cream-60)}
 .plan__tag{margin-bottom:18px;opacity:.5}
 .plan__price{font-family:var(--display);font-weight:800;font-size:clamp(1.7rem,3vw,2.5rem);
   letter-spacing:-.03em;margin:16px 0 20px}
@@ -504,6 +508,12 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .plan li{font-size:15px;color:var(--ink-60);display:flex;gap:.6em}
 .plan li::before{content:"—";opacity:.5}
 .plan .btn{margin-top:auto;align-self:flex-start}
+/* Ці перевизначення мають стояти саме тут, після базових .plan li:
+   вагомість у них однакова, тому вирішує порядок у файлі. Подвоєний
+   клас додає ваги, щоб правило не загубилось при майбутніх правках. */
+.plan.plan--featured .plan__price{color:var(--accent)}
+.plan.plan--featured li{color:var(--cream-60)}
+.plan.plan--featured li::before{opacity:.45}
 .plans-note{margin-top:24px;color:var(--ink-40);max-width:60ch}
 
 /* --- роботи: закріплена горизонтальна прокрутка ----------------------------
