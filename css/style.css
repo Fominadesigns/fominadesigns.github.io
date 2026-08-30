@@ -4,6 +4,10 @@
    ========================================================================== */
 
 :root{
+  /* Яскравість переливу на всю сторінку. 0 — вимкнено.
+     Понад 0.45 починає помітно чіпати читабельність тексту. */
+  --sheen:.3;
+
   --cream:#F3F3EF;
   --ink:#0A0A0A;
   --accent:#F9FE4A;
@@ -37,6 +41,28 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 ul{list-style:none}
 @supports (overflow:clip){html,body{overflow-x:clip}}
+
+/* --- перелив на всю сторінку ----------------------------------------------
+   Плівка поверх сторінки з мʼяким накладанням: підкрашує, але не
+   перемальовує кольори. Лежить нижче шапки, меню, курсора й превʼю,
+   тому вони лишаються чистими. Кліки не перехоплює. */
+.sheen{
+  position:fixed;inset:-25%;z-index:5;pointer-events:none;
+  opacity:var(--sheen);
+  mix-blend-mode:soft-light;
+  background:
+    radial-gradient(38% 42% at 18% 22%, #F9FE4A 0%, transparent 62%),
+    radial-gradient(34% 38% at 82% 18%, #6FD8FF 0%, transparent 62%),
+    radial-gradient(44% 48% at 72% 78%, #FF8FD8 0%, transparent 62%),
+    radial-gradient(40% 42% at 24% 76%, #8CFFC0 0%, transparent 62%);
+  filter:blur(46px) saturate(125%);
+  animation:sheen-drift 28s ease-in-out infinite alternate;
+}
+@keyframes sheen-drift{
+  0%{transform:translate3d(-3%,-2%,0) rotate(0deg) scale(1.06)}
+  50%{transform:translate3d(3%,2%,0) rotate(7deg) scale(1.16)}
+  100%{transform:translate3d(-2%,3%,0) rotate(-6deg) scale(1.09)}
+}
 
 /* --- типографіка ---------------------------------------------------------- */
 .mono{
@@ -765,4 +791,5 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
   .reveal{opacity:1;transform:none}
   .marquee__track{animation:none}
+  .sheen{animation:none}
 }
