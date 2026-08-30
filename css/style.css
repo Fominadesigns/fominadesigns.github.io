@@ -360,19 +360,13 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 }
 
 /* --- кейси ---------------------------------------------------------------- */
-/* row-gap — щоб чорна плашка на ховері не торкалась сусіднього рядка.
-   perspective — та сама, що була в старій збірці (1500px), щоб глибина
-   нахилу відчувалась так само. */
-.cases{
-  display:flex;flex-direction:column;gap:clamp(8px,1.1vw,18px);
-  perspective:1500px;transform-style:preserve-3d;
-}
+/* row-gap — щоб чорна плашка на ховері не торкалась сусіднього рядка */
+.cases{display:flex;flex-direction:column;gap:clamp(8px,1.1vw,18px)}
 .case{
   position:relative;display:flex;align-items:baseline;gap:.6em;
   font-family:var(--display);font-weight:800;letter-spacing:-.03em;
   font-size:clamp(1.8rem,5.6vw,5rem);line-height:1.16;
   padding:.16em .3em;margin-left:-.3em;border-radius:4px;
-  transform-origin:left center;will-change:transform;
   transition:background-color .45s cubic-bezier(.2,.7,.3,1),color .45s,padding-left .45s;
 }
 .case__num{font-family:var(--mono);font-size:11px;letter-spacing:.2em;opacity:.4;align-self:flex-start;margin-top:1.4em}

@@ -392,48 +392,6 @@
     measure();
   }
 
-  /* --- кейси: нахил під час прокрутки --------------------------------------
-
-     Рядок, що йде до центру екрана, вирівнюється; той, що віддаляється —
-     відхиляється. Виходить відчуття площини під кутом, як було на старому
-     сайті. Перспективу задає CSS, кут рахуємо тут.                        */
-
-  var caseRows = document.querySelectorAll('#cases .case');
-
-  if (caseRows.length && !reduceMotion) {
-    var cFrame = 0;
-
-    function tiltCases() {
-      var mid = window.innerHeight / 2;
-
-      Array.prototype.forEach.call(caseRows, function (el) {
-        var r = el.getBoundingClientRect();
-
-        // за межами екрана не рахуємо — зайва робота щокадру
-        if (r.bottom < -200 || r.top > window.innerHeight + 200) { return; }
-
-        var centre = r.top + r.height / 2;
-        var d = (centre - mid) / mid;        // -1 зверху, 0 по центру, 1 знизу
-        if (d < -1) { d = -1; }
-        if (d > 1) { d = 1; }
-
-        var rx = (-d * 11).toFixed(2);       // нахил уперед-назад
-        var ry = (d * 5).toFixed(2);         // легкий доворот убік
-        el.style.transform =
-          'rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateZ(0)';
-      });
-
-      cFrame = 0;
-    }
-
-    window.addEventListener('scroll', function () {
-      if (cFrame) { return; }
-      cFrame = requestAnimationFrame(tiltCases);
-    }, { passive: true });
-    window.addEventListener('resize', tiltCases);
-    tiltCases();
-  }
-
   /* --- місія: слова засвічуються при прокрутці -----------------------------
 
      Текст лишається у розмітці цілим — розбиваємо на слова вже тут.
