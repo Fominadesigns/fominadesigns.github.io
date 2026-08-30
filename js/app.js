@@ -190,7 +190,6 @@
 
   if (preview && cases.length && hasHover && !reduceMotion) {
     var img = preview.querySelector('img');
-    var px = 0, py = 0, pticking = false;
 
     // Прев'ю не стрибає за мишею, а плавно її наздоганяє: цільову точку
     // задає курсор, а сама картка щокадру підтягується до неї частками.
@@ -198,9 +197,19 @@
     var targetX = 0, targetY = 0;
     var curX = 0, curY = 0;
     var tilt = 0;
-    var running = false;
+    var rafId = 0;
+
+    // Замість прапорця «цикл працює» тримаємо саме id кадру. Так неможливо
+    // опинитись у стані, коли прапорець каже «працює», а кадр уже не
+    // заплановано — саме через це прев'ю не зʼявлялось на частині посилань.
+    function start() {
+      if (rafId) { return; }
+      rafId = requestAnimationFrame(follow);
+    }
 
     function follow() {
+      rafId = 0;
+
       var dx = targetX - curX;
       var dy = targetY - curY;
 
@@ -218,22 +227,18 @@
       // крутимось, поки прев'ю видиме або ще не доїхало
       if (preview.classList.contains('on') ||
           Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        requestAnimationFrame(follow);
-      } else {
-        running = false;
+        start();
       }
     }
 
-    function onMove(e) {
-      // зсув від курсора, щоб прев'ю не перекривало саму назву
+    // Рух ловимо на всьому документі, а не на кожному посиланні: коли курсор
+    // переходить з одного рядка на інший, він на мить опиняється між ними,
+    // і при слуханні лише посилань ціль переставала оновлюватись.
+    document.addEventListener('mousemove', function (e) {
       targetX = e.clientX + 40;
       targetY = e.clientY;
-
-      if (!running) {
-        running = true;
-        requestAnimationFrame(follow);
-      }
-    }
+      if (preview.classList.contains('on')) { start(); }
+    }, { passive: true });
 
     function jumpTo(e) {
       // при першій появі ставимо картку одразу на місце,
@@ -260,10 +265,8 @@
         img.alt = '';
         jumpTo(e);
         preview.classList.add('on');
-        onMove(e);
+        start();
       });
-
-      link.addEventListener('mousemove', onMove);
 
       link.addEventListener('mouseleave', function () {
         preview.classList.remove('on');
