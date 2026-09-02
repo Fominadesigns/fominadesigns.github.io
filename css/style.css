@@ -326,6 +326,8 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .belt{background:var(--ink);color:var(--cream);padding:clamp(40px,6vw,80px) 0}
 .belt__head{padding:0 var(--pad);margin-bottom:clamp(20px,3vw,32px);opacity:.45}
 .marquee--images .marquee__group{gap:clamp(10px,1.2vw,18px);padding-right:clamp(10px,1.2vw,18px)}
+.belt__item{display:block;padding:0;border-radius:10px;overflow:hidden;flex:0 0 auto;cursor:zoom-in}
+.belt__item:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .marquee--images img{
   width:clamp(120px,13vw,190px);aspect-ratio:9/16;object-fit:cover;
   border-radius:10px;flex:0 0 auto;
@@ -339,7 +341,7 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .trail{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
 .trail__img{
   position:absolute;top:0;left:0;
-  width:clamp(110px,10vw,165px);aspect-ratio:9/16;
+  width:clamp(180px,17vw,280px);aspect-ratio:16/10;
   object-fit:cover;border-radius:10px;
   opacity:0;will-change:transform,opacity;
 }
@@ -510,125 +512,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
 .plan.plan--featured li::before{opacity:.45}
 .plans-note{margin-top:24px;color:var(--ink-40);max-width:60ch}
 
-/* --- роботи: закріплена горизонтальна прокрутка ----------------------------
-
-   Базовий стан (він же запасний, якщо JS не спрацював або екран вузький) —
-   звичайна горизонтальна прокрутка пальцем чи тачпадом.
-   Клас .works--pinned додає JS: секція закріплюється, а вся доріжка —
-   разом із заголовком — їде вбік пропорційно до пройденої прокрутки.
-   Саму прокрутку не перехоплюємо, рахуємо лише пройдений шлях.
---------------------------------------------------------------------------- */
-
-/* Кут для градієнтної обводки. @property потрібен, щоб кут можна було
-   анімувати — звичайну CSS-змінну браузер анімувати не вміє. */
-@property --angle{syntax:"<angle>";initial-value:0deg;inherits:false}
-
-.works{background:var(--cream);color:var(--ink);position:relative}
-@supports (overflow:clip){.works{overflow-x:clip}}
-.works__stage{padding:clamp(64px,9vw,120px) 0}
-.works__viewport{
-  overflow-x:auto;overscroll-behavior-x:contain;
-  padding:4px var(--pad);
-  scrollbar-width:thin;scrollbar-color:var(--ink-12) transparent;
-}
-.works__viewport::-webkit-scrollbar{height:6px}
-.works__viewport::-webkit-scrollbar-thumb{background:var(--ink-12);border-radius:999px}
-/* max-content — доріжка завжди має справжню ширину вмісту: у звичайному
-   режимі це дає горизонтальну прокрутку, у закріпленому — правильне
-   вимірювання шляху. Без цього перше вимірювання бачить ширину екрана. */
-.works__track{display:flex;gap:clamp(16px,2vw,32px);align-items:center;width:max-content}
-
-/* заголовок — перша комірка доріжки, тому їде разом із роботами */
-.works__intro{flex:0 0 clamp(260px,28vw,380px);padding-right:clamp(8px,2vw,24px)}
-.works__intro p{margin-top:16px;color:var(--ink-60);font-size:15px}
-.works__hint{display:flex;align-items:center;gap:10px;margin-top:26px;color:var(--ink-40)}
-.works__hint span{display:flex;align-items:center;gap:10px}
-.works__hint svg{flex:0 0 auto}
-.works__hint--pinned{display:none}
-.works__progress{
-  margin-top:22px;height:2px;background:var(--ink-12);border-radius:2px;overflow:hidden;
-  opacity:0;transition:opacity .4s;
-}
-.works__progress span{display:block;height:100%;width:0;background:var(--ink);border-radius:2px}
-
-/* --- закріплений режим --- */
-.works--pinned .works__stage{
-  position:sticky;top:0;height:100svh;
-  display:flex;align-items:center;overflow:hidden;padding:0;
-}
-/* width і min-width обов'язкові: без них вікно перегляду — гнучкий
-   елемент без заданої ширини — розтягується під ширину вмісту, і
-   вимірювання починає давати «нема чого прокручувати». Стан тоді
-   перемикається туди-сюди по колу. */
-.works--pinned .works__viewport{
-  overflow:hidden;padding:0 var(--pad);
-  flex:0 0 100%;width:100%;min-width:0;
-}
-.works--pinned .works__track{will-change:transform}
-
-/* У закріпленому режимі картку задає ВИСОТА, а не ширина: так ряд
-   гарантовано вміщається в екран і стоїть рівно посередині,
-   на будь-якому масштабі й розмірі вікна. */
-.works--pinned .work{flex:0 0 auto}
-.works--pinned .work__frame{width:max-content}
-.works--pinned .work__frame img{
-  height:clamp(220px,48svh,480px);width:auto;
-}
-
-/* Хвіст доріжки: щоб остання робота доїжджала не впритул до краю,
-   а з відступом — і лише тоді прокрутка йшла вниз. */
-.works__tail{flex:0 0 clamp(24px,8vw,180px)}
-.works--pinned .works__hint--free{display:none}
-.works--pinned .works__hint--pinned{display:flex}
-.works--pinned .works__progress{opacity:1}
-
-/* --- картка --- */
-.work{
-  flex:0 0 clamp(190px,20vw,260px);
-  position:relative;border-radius:14px;
-  transition:transform .45s cubic-bezier(.2,.7,.3,1);
-}
-.work:hover{transform:translateY(-6px)}
-
-.work__frame{
-  display:block;width:100%;padding:0;
-  position:relative;border-radius:14px;overflow:hidden;background:var(--ink);
-  box-shadow:0 2px 8px rgba(10,10,10,.06);
-  cursor:zoom-in;
-  transition:box-shadow .45s cubic-bezier(.2,.7,.3,1);
-}
-.work:hover .work__frame{box-shadow:0 18px 40px rgba(10,10,10,.18)}
-.work__frame:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
-
-/* Градієнтна обводка вмикається лише на ховері, щоб не смикати очі
-   постійним рухом у дванадцяти картках одночасно. */
-.work__frame::before{
-  content:"";position:absolute;inset:-2px;z-index:0;border-radius:16px;
-  background:conic-gradient(from var(--angle),
-    var(--accent),rgba(249,254,74,0) 25%,rgba(249,254,74,0) 75%,var(--accent));
-  opacity:0;transition:opacity .4s;
-}
-.work:hover .work__frame::before{opacity:1;animation:spin-border 3.2s linear infinite}
-@keyframes spin-border{to{--angle:360deg}}
-
-.work__frame img{
-  position:relative;z-index:1;
-  width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:13px;
-  transition:transform .7s cubic-bezier(.2,.7,.3,1),filter .45s;
-  filter:saturate(.92);
-}
-.work:hover .work__frame img{transform:scale(1.05);filter:saturate(1.06)}
-
-.work figcaption{
-  margin-top:12px;font-family:var(--mono);font-size:10px;letter-spacing:.13em;
-  text-transform:uppercase;color:var(--ink-40);transition:color .3s;
-}
-.work:hover figcaption{color:var(--ink)}
-
-@supports not (background:conic-gradient(from var(--angle),red,blue)){
-  .work:hover .work__frame::before{background:var(--accent);animation:none}
-}
-
 /* --- перегляд роботи на весь екран ---------------------------------------- */
 .viewer{
   position:fixed;inset:0;z-index:100;
@@ -731,8 +614,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   .plans{grid-template-columns:minmax(0,1fr)}
   .about{grid-template-columns:minmax(0,1fr)}
   .about__photo{max-width:280px}
-  .works__intro{flex:0 0 78vw}
-  .work{flex:0 0 58vw}
   .case-preview{display:none!important}
   .case{align-items:center;gap:.5em}
   .case__num{margin-top:0}
@@ -755,8 +636,6 @@ h3{font-size:clamp(1.1rem,1.8vw,1.5rem);letter-spacing:-.02em;line-height:1.15}
   .app{grid-template-columns:minmax(0,1fr);text-align:left}
   .app__shot{max-width:180px}
   .steps{grid-template-columns:minmax(0,1fr)}
-  .works__intro{flex:0 0 86vw}
-  .work{flex:0 0 70vw}
 }
 
 /* --- повага до налаштувань руху ------------------------------------------- */
