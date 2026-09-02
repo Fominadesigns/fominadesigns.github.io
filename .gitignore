@@ -7,3 +7,8 @@ _archive/
 .DS_Store
 Thumbs.db
 node_modules/
+
+# Внутрішні документи — стратегія, брифи, нотатки.
+# У відкритий репозиторій не йдуть.
+content/
+*-brief.md
